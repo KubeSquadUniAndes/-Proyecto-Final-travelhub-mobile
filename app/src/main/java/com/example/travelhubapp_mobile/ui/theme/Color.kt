@@ -2,10 +2,15 @@ package com.example.travelhubapp_mobile.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
-
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+val Blue600 = Color(0xFF155DFC)
+val Blue100 = Color(0xFFDBEAFE)
+val Blue900 = Color(0xFF1C398E)
+val Gray50 = Color(0xFFF9FAFB)
+val Gray200 = Color(0xFFE5E7EB)
+val Gray300 = Color(0xFFD1D5DC)
+val Gray500 = Color(0xFF6A7282)
+val Gray600 = Color(0xFF4A5565)
+val Gray700 = Color(0xFF364153)
+val Gray900 = Color(0xFF1E2939)
+val White = Color(0xFFFFFFFF)
+val StarYellow = Color(0xFFF0B100)
