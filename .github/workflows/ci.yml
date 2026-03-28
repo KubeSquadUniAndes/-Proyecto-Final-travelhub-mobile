@@ -1,0 +1,167 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop, 'feature/**', 'hotfix/**']
+  pull_request:
+    branches: [main, develop]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  # ─────────────────────────────────────────────
+  # JOB 1: Unit Tests + Coverage
+  # ─────────────────────────────────────────────
+  unit-tests:
+    name: Unit Tests & Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v3
+
+      - name: Run unit tests
+        run: ./gradlew testDebugUnitTest jacocoTestReport
+
+      - name: Check coverage threshold (70%)
+        run: |
+          COVERAGE=$(python3 -c "
+          import xml.etree.ElementTree as ET
+          tree = ET.parse('app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml')
+          root = tree.getroot()
+          missed, covered = 0, 0
+          for c in root.findall('.//counter[@type=\"LINE\"]'):
+              missed += int(c.get('missed', 0))
+              covered += int(c.get('covered', 0))
+          total = missed + covered
+          print(f'{(covered/total*100):.1f}' if total > 0 else '0')
+          ")
+          echo "Coverage: ${COVERAGE}%"
+          python3 -c "
+          cov = float('${COVERAGE}')
+          assert cov >= 70, f'Coverage {cov}% is below the 70% threshold'
+          print(f'Coverage check passed: {cov}%')
+          "
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: app/build/reports/jacoco/
+          retention-days: 15
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: app/build/test-results/
+          retention-days: 15
+
+  # ─────────────────────────────────────────────
+  # JOB 2: Android Lint
+  # ─────────────────────────────────────────────
+  lint:
+    name: Android Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v3
+
+      - name: Run lint
+        run: ./gradlew lintDebug
+
+      - name: Upload lint report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-report
+          path: app/build/reports/lint-results-debug.*
+          retention-days: 15
+
+  # ─────────────────────────────────────────────
+  # JOB 3: Code Quality — Detekt
+  # ─────────────────────────────────────────────
+  code-quality:
+    name: Code Quality (Detekt)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v3
+
+      - name: Run Detekt
+        run: ./gradlew detekt
+
+      - name: Upload Detekt report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: detekt-report
+          path: app/build/reports/detekt/
+          retention-days: 15
+
+  # ─────────────────────────────────────────────
+  # JOB 4: Security — GitHub Dependency Review
+  # Instant: uses GitHub's dependency graph, no downloads
+  # Only runs on pull_request (needs base vs head comparison)
+  # ─────────────────────────────────────────────
+  security:
+    name: Security (Dependency Review)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
+          deny-licenses: GPL-2.0, GPL-3.0
+
+  # ─────────────────────────────────────────────
+  # JOB 5: Build — solo si unit-tests, lint y code-quality pasan
+  # ─────────────────────────────────────────────
+  build:
+    name: Build APK
+    runs-on: ubuntu-latest
+    needs: [ unit-tests, lint, code-quality ]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v3
+
+      - name: Build debug APK
+        run: ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 15
