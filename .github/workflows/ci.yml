@@ -144,6 +144,7 @@ jobs:
         uses: anchore/sbom-action@v0.24.0
         with:
           artifact-name: sbom.spdx.json
+          output-file: sbom.spdx.json
 
       - name: Scan for vulnerabilities (push only)
         if: github.event_name == 'push'
