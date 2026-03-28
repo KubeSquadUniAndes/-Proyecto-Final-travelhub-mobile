@@ -1,12 +1,9 @@
 *.iml
 .gradle
 /local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+# Ignore all .idea except shared run configurations
+/.idea/*
+!/.idea/runConfigurations/
 .DS_Store
 /build
 /captures

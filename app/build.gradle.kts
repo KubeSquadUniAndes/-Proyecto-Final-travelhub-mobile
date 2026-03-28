@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    jacoco
 }
 
 android {
@@ -22,6 +23,10 @@ android {
     }
 
     buildTypes {
+        debug {
+            // Must be OFF — AGP pre-instrumentation breaks JaCoCo offline mode
+            enableUnitTestCoverage = false
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -37,6 +42,64 @@ android {
     buildFeatures {
         compose = true
     }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
+}
+
+jacoco {
+    toolVersion = "0.8.12"
+}
+
+val compiledClassesDir = layout.buildDirectory.dir(
+    "intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes"
+)
+val jacocoOfflineDir = layout.buildDirectory.dir("jacoco-offline-classes")
+val jacocoExecFile = layout.buildDirectory.file("jacoco/testDebugUnitTest.exec")
+
+val instrumentClassesOffline by tasks.registering(JacocoOfflineInstrumentTask::class) {
+    dependsOn("compileDebugKotlin")
+    inputDirectory.set(compiledClassesDir)
+    outputDirectory.set(jacocoOfflineDir)
+}
+
+afterEvaluate {
+    tasks.named<Test>("testDebugUnitTest") {
+        dependsOn(instrumentClassesOffline)
+        doFirst {
+            // Instrumented classes must come first so Robolectric loads them
+            classpath = files(jacocoOfflineDir) + classpath
+            // Tell JaCoCo offline runtime where to write the exec file
+            systemProperty(
+                "jacoco-agent.destfile",
+                jacocoExecFile.get().asFile.absolutePath
+            )
+        }
+    }
+}
+
+tasks.register<JacocoReport>("jacocoTestReport") {
+    dependsOn("testDebugUnitTest")
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+        html.outputLocation.set(layout.buildDirectory.dir("reports/jacoco/html"))
+    }
+
+    classDirectories.setFrom(
+        fileTree(compiledClassesDir) {
+            exclude(
+                "**/R.class", "**/R\$*.class", "**/BuildConfig.*",
+                "**/Manifest*.*", "**/ComposableSingletons*.*",
+                "**/*\$Lambda\$*.*", "**/*\$inlined\$*.*"
+            )
+        }
+    )
+    sourceDirectories.setFrom(files("src/main/java"))
+    executionData.setFrom(jacocoExecFile)
 }
 
 dependencies {
@@ -51,6 +114,16 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.compose.material.icons.extended)
     testImplementation(libs.junit)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.compose.ui)
+    testImplementation(libs.androidx.compose.ui.test.junit4)
+    testImplementation(libs.androidx.compose.ui.test.manifest)
+    testImplementation(libs.androidx.compose.material3)
+    testImplementation(libs.androidx.compose.material.icons.extended)
+    testImplementation(libs.androidx.navigation.compose)
+    testImplementation(libs.androidx.activity.compose)
+    // JaCoCo offline runtime — needed so instrumented classes can write exec data
+    testImplementation("org.jacoco:org.jacoco.core:0.8.12")
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
