@@ -1,6 +1,6 @@
 package com.example.travelhubapp_mobile.ui.screens
 
-import androidx.compose.ui.test.assertExists
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import com.example.travelhubapp_mobile.ui.theme.TravelHubAppMobileTheme
@@ -31,6 +31,6 @@ class HomeScreenRoboTest {
             TravelHubAppMobileTheme { HomeScreen(onLogout = {}) }
         }
         composeTestRule.waitForIdle()
-        composeTestRule.onNodeWithText("Cerrar sesión").assertExists()
+        composeTestRule.onNodeWithText("Cerrar sesión").assertIsDisplayed()
     }
 }
