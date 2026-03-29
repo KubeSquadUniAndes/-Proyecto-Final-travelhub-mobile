@@ -94,11 +94,10 @@ class LoginScreenRoboTest {
     }
 
     @Test
-    fun loginButton_callsCallback() {
-        var clicked = false
-        setScreen(onLogin = { clicked = true })
+    fun emptyFields_showsError() {
+        setScreen()
         composeTestRule.onAllNodesWithText("Iniciar sesión")[0].performScrollTo().performClick()
-        assert(clicked)
+        composeTestRule.onNodeWithText("Completa todos los campos").assertExists()
     }
 
     @Test

@@ -21,8 +21,13 @@ class RoutesTest {
     }
 
     @Test
+    fun homeRoute_isCorrect() {
+        assertEquals("home", Routes.HOME)
+    }
+
+    @Test
     fun routes_areUnique() {
-        val routes = listOf(Routes.BIENVENIDA, Routes.LOGIN, Routes.REGISTRO)
+        val routes = listOf(Routes.BIENVENIDA, Routes.LOGIN, Routes.REGISTRO, Routes.HOME)
         assertEquals(routes.size, routes.distinct().size)
     }
 }

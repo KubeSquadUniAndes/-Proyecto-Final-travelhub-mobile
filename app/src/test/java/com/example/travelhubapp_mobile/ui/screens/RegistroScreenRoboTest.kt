@@ -57,6 +57,12 @@ class RegistroScreenRoboTest {
     }
 
     @Test
+    fun displaysIdNumberLabel() {
+        setScreen()
+        composeTestRule.onNodeWithText("Número de identificación").assertExists()
+    }
+
+    @Test
     fun displaysPasswordLabel() {
         setScreen()
         composeTestRule.onNodeWithText("Contraseña").assertExists()
@@ -71,7 +77,7 @@ class RegistroScreenRoboTest {
     @Test
     fun displaysCreateAccountButton() {
         setScreen()
-        composeTestRule.onAllNodesWithText("Crear cuenta").assertCountEquals(2) // title + button
+        composeTestRule.onAllNodesWithText("Crear cuenta").assertCountEquals(2)
     }
 
     @Test
@@ -108,6 +114,20 @@ class RegistroScreenRoboTest {
     }
 
     @Test
+    fun idNumberField_acceptsInput() {
+        setScreen()
+        composeTestRule.onAllNodes(hasSetTextAction())[3].performTextInput("1234567890")
+        composeTestRule.onNodeWithText("1234567890").assertExists()
+    }
+
+    @Test
+    fun emptyFields_showsError() {
+        setScreen()
+        composeTestRule.onAllNodesWithText("Crear cuenta")[1].performScrollTo().performClick()
+        composeTestRule.onNodeWithText("Completa todos los campos").assertExists()
+    }
+
+    @Test
     fun backButton_callsCallback() {
         var clicked = false
         setScreen(onBack = { clicked = true })
@@ -133,5 +153,11 @@ class RegistroScreenRoboTest {
     fun displaysEmailPlaceholder() {
         setScreen()
         composeTestRule.onNodeWithText("correo@ejemplo.com").assertExists()
+    }
+
+    @Test
+    fun displaysIdNumberPlaceholder() {
+        setScreen()
+        composeTestRule.onNodeWithText("1234567890").assertExists()
     }
 }
