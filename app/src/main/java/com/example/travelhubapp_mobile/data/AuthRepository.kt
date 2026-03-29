@@ -4,6 +4,7 @@ import com.example.travelhubapp_mobile.network.LoginRequest
 import com.example.travelhubapp_mobile.network.ProfileResponse
 import com.example.travelhubapp_mobile.network.RegisterRequest
 import com.example.travelhubapp_mobile.network.RetrofitClient
+import java.io.IOException
 
 sealed class AuthResult<out T> {
     data class Success<T>(val data: T) : AuthResult<T>()
@@ -39,8 +40,8 @@ class AuthRepository(private val tokenManager: TokenManager) {
                 val error = response.errorBody()?.string() ?: "Error en registro"
                 AuthResult.Error(error)
             }
-        } catch (e: Exception) {
-            AuthResult.Error(e.message ?: "Error de conexión")
+        } catch (e: IOException) {
+            AuthResult.Error("Error de conexión: ${e.message}")
         }
     }
 
@@ -59,14 +60,15 @@ class AuthRepository(private val tokenManager: TokenManager) {
                 val error = response.errorBody()?.string() ?: "Credenciales inválidas"
                 AuthResult.Error(error)
             }
-        } catch (e: Exception) {
-            AuthResult.Error(e.message ?: "Error de conexión")
+        } catch (e: IOException) {
+            AuthResult.Error("Error de conexión: ${e.message}")
         }
     }
 
     suspend fun getProfile(): AuthResult<ProfileResponse> {
         return try {
-            val token = tokenManager.getToken() ?: return AuthResult.Error("No hay sesión activa")
+            val token = tokenManager.getToken()
+                ?: return AuthResult.Error("No hay sesión activa")
             val response = api.getProfile("Bearer $token")
             if (response.isSuccessful) {
                 response.body()?.let { AuthResult.Success(it) }
@@ -74,8 +76,8 @@ class AuthRepository(private val tokenManager: TokenManager) {
             } else {
                 AuthResult.Error("Error al obtener perfil")
             }
-        } catch (e: Exception) {
-            AuthResult.Error(e.message ?: "Error de conexión")
+        } catch (e: IOException) {
+            AuthResult.Error("Error de conexión: ${e.message}")
         }
     }
 

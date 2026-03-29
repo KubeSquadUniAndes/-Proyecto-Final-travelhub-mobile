@@ -1,6 +1,9 @@
 package com.example.travelhubapp_mobile.data
 
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class AuthResultTest {
@@ -32,15 +35,6 @@ class AuthResultTest {
     }
 
     @Test
-    fun success_withDifferentTypes() {
-        val intResult = AuthResult.Success(42)
-        assertEquals(42, intResult.data)
-
-        val listResult = AuthResult.Success(listOf("a", "b"))
-        assertEquals(2, listResult.data.size)
-    }
-
-    @Test
     fun whenExpression_worksCorrectly() {
         val success: AuthResult<String> = AuthResult.Success("data")
         val error: AuthResult<String> = AuthResult.Error("error")
@@ -56,5 +50,11 @@ class AuthResultTest {
             is AuthResult.Error -> error.message
         }
         assertEquals("error", errorValue)
+    }
+
+    @Test
+    fun success_withNullableData() {
+        val result = AuthResult.Success<String?>(null)
+        assertNull(result.data)
     }
 }

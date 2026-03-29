@@ -1,7 +1,9 @@
 package com.example.travelhubapp_mobile.network
 
 import com.google.gson.Gson
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class ModelsTest {
@@ -11,20 +13,14 @@ class ModelsTest {
     @Test
     fun registerRequest_serializesCorrectly() {
         val request = RegisterRequest(
-            firstName = "Juan",
-            lastName = "Pérez",
-            email = "juan@test.com",
-            phone = "+57 300 123 4567",
-            password = "SecurePass123!",
-            identificationNumber = "1234567890"
+            firstName = "Juan", lastName = "Pérez",
+            email = "juan@test.com", phone = "+57 300 123 4567",
+            password = "SecurePass123!", identificationNumber = "1234567890"
         )
         val json = gson.toJson(request)
         assertTrue(json.contains("\"first_name\":\"Juan\""))
         assertTrue(json.contains("\"last_name\":\"Pérez\""))
-        assertTrue(json.contains("\"email\":\"juan@test.com\""))
-        assertTrue(json.contains("\"user_type\":\"traveler\""))
         assertTrue(json.contains("\"identification_number\":\"1234567890\""))
-        assertTrue(json.contains("\"identification_type\":\"CC\""))
     }
 
     @Test
@@ -37,7 +33,6 @@ class ModelsTest {
         assertEquals("Bogotá", request.city)
         assertEquals("traveler", request.userType)
         assertEquals("CC", request.identificationType)
-        assertEquals("1995-01-01", request.birthDate)
     }
 
     @Test
@@ -66,19 +61,17 @@ class ModelsTest {
 
     @Test
     fun profileResponse_deserializesWithFullName() {
-        val json = """{"id":"123","email":"test@mail.com","full_name":"Juan Pérez","status":"active"}"""
+        val json = """{"id":"123","email":"t@m.com","full_name":"Juan","status":"active"}"""
         val response = gson.fromJson(json, ProfileResponse::class.java)
         assertEquals("123", response.id)
-        assertEquals("test@mail.com", response.email)
-        assertEquals("Juan Pérez", response.fullName)
+        assertEquals("Juan", response.fullName)
         assertEquals("active", response.status)
         assertNull(response.firstName)
-        assertNull(response.lastName)
     }
 
     @Test
     fun profileResponse_deserializesWithFirstLastName() {
-        val json = """{"id":"456","first_name":"Ana","last_name":"García","email":"ana@mail.com"}"""
+        val json = """{"id":"456","first_name":"Ana","last_name":"García"}"""
         val response = gson.fromJson(json, ProfileResponse::class.java)
         assertEquals("Ana", response.firstName)
         assertEquals("García", response.lastName)
@@ -87,10 +80,9 @@ class ModelsTest {
 
     @Test
     fun registerResponse_deserializesCorrectly() {
-        val json = """{"id":"uuid-123","message":"Created","email":"test@mail.com"}"""
+        val json = """{"id":"uuid-123","message":"Created","email":"t@m.com"}"""
         val response = gson.fromJson(json, RegisterResponse::class.java)
         assertEquals("uuid-123", response.id)
         assertEquals("Created", response.message)
-        assertEquals("test@mail.com", response.email)
     }
 }

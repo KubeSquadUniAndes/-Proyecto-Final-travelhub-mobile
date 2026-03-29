@@ -132,6 +132,7 @@ dependencies {
     implementation(libs.androidx.datastore)
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
+    testImplementation("androidx.test:core:1.6.1")
     testImplementation(libs.androidx.compose.ui)
     testImplementation(libs.androidx.compose.ui.test.junit4)
     testImplementation(libs.androidx.compose.ui.test.manifest)

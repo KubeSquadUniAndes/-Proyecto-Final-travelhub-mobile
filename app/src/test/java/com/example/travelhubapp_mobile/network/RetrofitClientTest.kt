@@ -1,6 +1,8 @@
 package com.example.travelhubapp_mobile.network
 
-import org.junit.Assert.*
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertSame
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class RetrofitClientTest {
