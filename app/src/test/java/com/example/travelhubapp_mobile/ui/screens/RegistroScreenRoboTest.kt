@@ -179,6 +179,7 @@ class RegistroScreenRoboTest {
     @Test
     fun displaysDefaultIdType() {
         setScreen()
-        composeTestRule.onNodeWithText("Cédula (CC)").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Cédula (CC)")
+            .performScrollTo().assertIsDisplayed()
     }
 }

@@ -35,7 +35,7 @@ class AuthNavGraphRoboTest {
     fun navigatesToRegistroScreen() {
         composeTestRule.setContent { TravelHubAppMobileTheme { AuthNavGraph() } }
         composeTestRule.onNodeWithText("Registrarme como viajero").performClick()
-        composeTestRule.onNodeWithText("Nombre completo").assertExists()
+        composeTestRule.onNodeWithText("Nombre *").assertExists()
     }
 
     @Test
