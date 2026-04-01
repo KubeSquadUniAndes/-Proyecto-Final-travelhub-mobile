@@ -56,6 +56,7 @@ import com.example.travelhubapp_mobile.ui.theme.Blue100
 import com.example.travelhubapp_mobile.ui.theme.Blue600
 import com.example.travelhubapp_mobile.ui.theme.Gray600
 import com.example.travelhubapp_mobile.ui.theme.White
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 private const val MIN_PASSWORD_LENGTH = 8
@@ -66,6 +67,13 @@ private val ID_TYPES = listOf(
     "CE" to "Cédula Extranjería (CE)",
     "PA" to "Pasaporte (PA)",
     "TI" to "Tarjeta de Identidad (TI)"
+)
+
+private data class RegistroFields(
+    val firstName: String, val lastName: String, val email: String,
+    val phone: String, val country: String, val city: String,
+    val birthDate: String, val idNumber: String,
+    val password: String, val confirmPassword: String
 )
 
 @Composable
@@ -93,6 +101,90 @@ fun RegistroScreen(
     val scope = rememberCoroutineScope()
     val authRepo = remember { AuthRepository(TokenManager(context)) }
 
+    val onSubmit = buildSubmitAction(
+        fields = { RegistroFields(firstName, lastName, email, phone, country, city, birthDate, idNumber, password, confirmPassword) },
+        idType = idType,
+        authRepo = authRepo,
+        scope = scope,
+        onLoading = { isLoading = it },
+        onError = { errorMessage = it },
+        onSuccess = { showSuccess = true }
+    )
+
+    RegistroContent(
+        firstName, lastName, email, phone, country, city,
+        birthDate, idType, idNumber, password, confirmPassword,
+        isLoading, errorMessage, onBack,
+        onClear = { errorMessage = null },
+        onFirstName = { firstName = it }, onLastName = { lastName = it },
+        onEmail = { email = it }, onPhone = { phone = it },
+        onCountry = { country = it }, onCity = { city = it },
+        onBirthDate = { birthDate = it }, onIdType = { idType = it },
+        onIdNumber = { idNumber = it }, onPassword = { password = it },
+        onConfirm = { confirmPassword = it },
+        onSubmit = onSubmit, onLogin = onLogin
+    )
+
+    if (showSuccess) { SuccessDialog { showSuccess = false; onRegister() } }
+}
+
+@Suppress("CyclomaticComplexMethod")
+private fun validateAllFields(fields: RegistroFields): String? = when {
+    fields.firstName.isBlank() || fields.lastName.isBlank() || fields.email.isBlank()
+        || fields.phone.isBlank() || fields.country.isBlank() || fields.city.isBlank()
+        || fields.birthDate.isBlank() || fields.idNumber.isBlank()
+        || fields.password.isBlank() -> "Completa todos los campos"
+    fields.password != fields.confirmPassword -> "Las contraseñas no coinciden"
+    fields.password.length < MIN_PASSWORD_LENGTH ->
+        "La contraseña debe tener mínimo $MIN_PASSWORD_LENGTH caracteres"
+    else -> null
+}
+
+@Suppress("LongParameterList")
+private fun buildSubmitAction(
+    fields: () -> RegistroFields,
+    idType: String,
+    authRepo: AuthRepository,
+    scope: CoroutineScope,
+    onLoading: (Boolean) -> Unit,
+    onError: (String?) -> Unit,
+    onSuccess: () -> Unit
+): () -> Unit = {
+    val f = fields()
+    val err = validateAllFields(f)
+    if (err != null) { onError(err) } else {
+        val idCode = ID_TYPES.find { it.second == idType }?.first ?: "CC"
+        scope.launch {
+            onLoading(true); onError(null)
+            when (val r = authRepo.register(
+                f.firstName, f.lastName, f.email, f.phone, f.password,
+                f.country, f.city, f.birthDate, idCode, f.idNumber
+            )) {
+                is AuthResult.Success -> onSuccess()
+                is AuthResult.Error -> onError(r.message)
+            }
+            onLoading(false)
+        }
+    }
+}
+
+@Suppress("LongParameterList")
+@Composable
+private fun RegistroContent(
+    firstName: String, lastName: String, email: String,
+    phone: String, country: String, city: String,
+    birthDate: String, idType: String, idNumber: String,
+    password: String, confirmPassword: String,
+    isLoading: Boolean, errorMessage: String?,
+    onBack: () -> Unit, onClear: () -> Unit,
+    onFirstName: (String) -> Unit, onLastName: (String) -> Unit,
+    onEmail: (String) -> Unit, onPhone: (String) -> Unit,
+    onCountry: (String) -> Unit, onCity: (String) -> Unit,
+    onBirthDate: (String) -> Unit, onIdType: (String) -> Unit,
+    onIdNumber: (String) -> Unit, onPassword: (String) -> Unit,
+    onConfirm: (String) -> Unit,
+    onSubmit: () -> Unit, onLogin: () -> Unit
+) {
     Column(
         Modifier.fillMaxSize().background(BluGradient)
             .verticalScroll(rememberScrollState())
@@ -103,62 +195,14 @@ fun RegistroScreen(
         RegistroFormCard(
             firstName, lastName, email, phone, country, city,
             birthDate, idType, idNumber, password, confirmPassword,
-            isLoading, errorMessage,
-            onClear = { errorMessage = null },
-            onFirstName = { firstName = it },
-            onLastName = { lastName = it },
-            onEmail = { email = it },
-            onPhone = { phone = it },
-            onCountry = { country = it },
-            onCity = { city = it },
-            onBirthDate = { birthDate = it },
-            onIdType = { idType = it },
-            onIdNumber = { idNumber = it },
-            onPassword = { password = it },
-            onConfirm = { confirmPassword = it },
-            onSubmit = {
-                val err = validateAllFields(
-                    firstName, lastName, email, phone,
-                    country, city, birthDate, idNumber,
-                    password, confirmPassword
-                )
-                if (err != null) { errorMessage = err; return@RegistroFormCard }
-                val idCode = ID_TYPES.find { it.second == idType }?.first ?: "CC"
-                scope.launch {
-                    isLoading = true; errorMessage = null
-                    when (val r = authRepo.register(
-                        firstName, lastName, email, phone, password,
-                        country, city, birthDate, idCode, idNumber
-                    )) {
-                        is AuthResult.Success -> showSuccess = true
-                        is AuthResult.Error -> errorMessage = r.message
-                    }
-                    isLoading = false
-                }
-            },
-            onLogin = onLogin
+            isLoading, errorMessage, onClear,
+            onFirstName, onLastName, onEmail, onPhone,
+            onCountry, onCity, onBirthDate, onIdType,
+            onIdNumber, onPassword, onConfirm,
+            onSubmit, onLogin
         )
         Spacer(Modifier.height(24.dp))
     }
-
-    if (showSuccess) { SuccessDialog { showSuccess = false; onRegister() } }
-}
-
-@Suppress("CyclomaticComplexMethod")
-private fun validateAllFields(
-    firstName: String, lastName: String, email: String,
-    phone: String, country: String, city: String,
-    birthDate: String, idNumber: String,
-    password: String, confirmPassword: String
-): String? = when {
-    firstName.isBlank() || lastName.isBlank() || email.isBlank()
-        || phone.isBlank() || country.isBlank() || city.isBlank()
-        || birthDate.isBlank() || idNumber.isBlank()
-        || password.isBlank() -> "Completa todos los campos"
-    password != confirmPassword -> "Las contraseñas no coinciden"
-    password.length < MIN_PASSWORD_LENGTH ->
-        "La contraseña debe tener mínimo $MIN_PASSWORD_LENGTH caracteres"
-    else -> null
 }
 
 @Composable

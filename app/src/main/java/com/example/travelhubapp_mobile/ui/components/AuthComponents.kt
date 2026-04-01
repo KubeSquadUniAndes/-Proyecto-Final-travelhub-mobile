@@ -50,6 +50,7 @@ import com.example.travelhubapp_mobile.ui.theme.Gray400
 import com.example.travelhubapp_mobile.ui.theme.Gray700
 import com.example.travelhubapp_mobile.ui.theme.White
 import java.util.Calendar
+import java.util.Locale
 
 val BluGradient = Brush.linearGradient(listOf(Blue600, Blue900))
 
@@ -180,7 +181,7 @@ fun THDatePicker(
             context,
             { _, year, month, day ->
                 val formatted = String.format(
-                    "%04d-%02d-%02d", year, month + 1, day
+                    Locale.ROOT, "%04d-%02d-%02d", year, month + 1, day
                 )
                 onValueChange(formatted)
             },
