@@ -62,11 +62,9 @@ class AuthComponentsTest {
                 THInput(value = "secret", onValueChange = {}, label = "Contraseña", isPassword = true)
             }
         }
-        // Toggle button should exist
-        composeTestRule.onNode(hasClickAction() and hasContentDescription("").not())
+        composeTestRule.onNodeWithContentDescription("Toggle password visibility")
             .assertExists()
-        // Click the visibility toggle (the trailing icon button)
-        composeTestRule.onAllNodes(hasClickAction())[0].performClick()
+            .performClick()
     }
 
     @Test

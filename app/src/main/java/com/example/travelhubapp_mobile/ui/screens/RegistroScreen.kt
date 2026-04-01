@@ -18,9 +18,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.LocationCity
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Public
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -46,6 +48,8 @@ import com.example.travelhubapp_mobile.data.AuthResult
 import com.example.travelhubapp_mobile.data.TokenManager
 import com.example.travelhubapp_mobile.ui.components.BluGradient
 import com.example.travelhubapp_mobile.ui.components.THBackButton
+import com.example.travelhubapp_mobile.ui.components.THDatePicker
+import com.example.travelhubapp_mobile.ui.components.THDropdown
 import com.example.travelhubapp_mobile.ui.components.THInput
 import com.example.travelhubapp_mobile.ui.components.THLogo
 import com.example.travelhubapp_mobile.ui.theme.Blue100
@@ -57,15 +61,27 @@ import kotlinx.coroutines.launch
 private const val MIN_PASSWORD_LENGTH = 8
 private val SUCCESS_COLOR = Color(0xFF00A63E)
 
+private val ID_TYPES = listOf(
+    "CC" to "Cédula (CC)",
+    "CE" to "Cédula Extranjería (CE)",
+    "PA" to "Pasaporte (PA)",
+    "TI" to "Tarjeta de Identidad (TI)"
+)
+
 @Composable
 fun RegistroScreen(
     onRegister: () -> Unit,
     onLogin: () -> Unit,
     onBack: () -> Unit
 ) {
-    var name by remember { mutableStateOf("") }
+    var firstName by remember { mutableStateOf("") }
+    var lastName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
+    var country by remember { mutableStateOf("") }
+    var city by remember { mutableStateOf("") }
+    var birthDate by remember { mutableStateOf("") }
+    var idType by remember { mutableStateOf("Cédula (CC)") }
     var idNumber by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
@@ -84,27 +100,35 @@ fun RegistroScreen(
         Spacer(Modifier.height(16.dp))
         Box(Modifier.padding(start = 16.dp)) { THBackButton(onBack) }
         RegistroHeader()
-        RegistroForm(
-            name, email, phone, idNumber, password, confirmPassword,
+        RegistroFormCard(
+            firstName, lastName, email, phone, country, city,
+            birthDate, idType, idNumber, password, confirmPassword,
             isLoading, errorMessage,
-            onFieldChange = { errorMessage = null },
-            onNameChange = { name = it },
-            onEmailChange = { email = it },
-            onPhoneChange = { phone = it },
-            onIdChange = { idNumber = it },
-            onPasswordChange = { password = it },
-            onConfirmChange = { confirmPassword = it },
+            onClear = { errorMessage = null },
+            onFirstName = { firstName = it },
+            onLastName = { lastName = it },
+            onEmail = { email = it },
+            onPhone = { phone = it },
+            onCountry = { country = it },
+            onCity = { city = it },
+            onBirthDate = { birthDate = it },
+            onIdType = { idType = it },
+            onIdNumber = { idNumber = it },
+            onPassword = { password = it },
+            onConfirm = { confirmPassword = it },
             onSubmit = {
-                val err = validateFields(
-                    name, email, phone, idNumber, password, confirmPassword
+                val err = validateAllFields(
+                    firstName, lastName, email, phone,
+                    country, city, birthDate, idNumber,
+                    password, confirmPassword
                 )
-                if (err != null) { errorMessage = err; return@RegistroForm }
-                val parts = name.trim().split(" ", limit = 2)
+                if (err != null) { errorMessage = err; return@RegistroFormCard }
+                val idCode = ID_TYPES.find { it.second == idType }?.first ?: "CC"
                 scope.launch {
                     isLoading = true; errorMessage = null
                     when (val r = authRepo.register(
-                        parts.first(), parts.getOrElse(1) { "" },
-                        email, phone, password, idNumber
+                        firstName, lastName, email, phone, password,
+                        country, city, birthDate, idCode, idNumber
                     )) {
                         is AuthResult.Success -> showSuccess = true
                         is AuthResult.Error -> errorMessage = r.message
@@ -120,12 +144,17 @@ fun RegistroScreen(
     if (showSuccess) { SuccessDialog { showSuccess = false; onRegister() } }
 }
 
-private fun validateFields(
-    name: String, email: String, phone: String,
-    idNumber: String, password: String, confirmPassword: String
+@Suppress("CyclomaticComplexMethod")
+private fun validateAllFields(
+    firstName: String, lastName: String, email: String,
+    phone: String, country: String, city: String,
+    birthDate: String, idNumber: String,
+    password: String, confirmPassword: String
 ): String? = when {
-    name.isBlank() || email.isBlank() || phone.isBlank()
-        || idNumber.isBlank() || password.isBlank() -> "Completa todos los campos"
+    firstName.isBlank() || lastName.isBlank() || email.isBlank()
+        || phone.isBlank() || country.isBlank() || city.isBlank()
+        || birthDate.isBlank() || idNumber.isBlank()
+        || password.isBlank() -> "Completa todos los campos"
     password != confirmPassword -> "Las contraseñas no coinciden"
     password.length < MIN_PASSWORD_LENGTH ->
         "La contraseña debe tener mínimo $MIN_PASSWORD_LENGTH caracteres"
@@ -143,22 +172,27 @@ private fun RegistroHeader() {
         THLogo()
         Text("Crear cuenta", style = MaterialTheme.typography.displayLarge, color = White)
         Text(
-            "Únete a TravelHub y descubre tu próximo destino",
+            "Completa tus datos para continuar",
             style = MaterialTheme.typography.bodyLarge, color = Blue100
         )
     }
 }
 
-@Suppress("LongParameterList")
+@Suppress("LongParameterList", "LongMethod")
 @Composable
-private fun RegistroForm(
-    name: String, email: String, phone: String, idNumber: String,
+private fun RegistroFormCard(
+    firstName: String, lastName: String, email: String,
+    phone: String, country: String, city: String,
+    birthDate: String, idType: String, idNumber: String,
     password: String, confirmPassword: String,
     isLoading: Boolean, errorMessage: String?,
-    onFieldChange: () -> Unit,
-    onNameChange: (String) -> Unit, onEmailChange: (String) -> Unit,
-    onPhoneChange: (String) -> Unit, onIdChange: (String) -> Unit,
-    onPasswordChange: (String) -> Unit, onConfirmChange: (String) -> Unit,
+    onClear: () -> Unit,
+    onFirstName: (String) -> Unit, onLastName: (String) -> Unit,
+    onEmail: (String) -> Unit, onPhone: (String) -> Unit,
+    onCountry: (String) -> Unit, onCity: (String) -> Unit,
+    onBirthDate: (String) -> Unit, onIdType: (String) -> Unit,
+    onIdNumber: (String) -> Unit, onPassword: (String) -> Unit,
+    onConfirm: (String) -> Unit,
     onSubmit: () -> Unit, onLogin: () -> Unit
 ) {
     Column(
@@ -166,26 +200,91 @@ private fun RegistroForm(
             .clip(RoundedCornerShape(16.dp)).background(White).padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        THInput(name, { onFieldChange(); onNameChange(it) },
-            "Nombre completo", "Juan Pérez García", Icons.Default.Person)
-        THInput(email, { onFieldChange(); onEmailChange(it) },
-            "Correo electrónico", "correo@ejemplo.com", Icons.Default.Email)
-        THInput(phone, { onFieldChange(); onPhoneChange(it) },
-            "Teléfono móvil", "+57 300 123 4567", Icons.Default.Phone)
-        THInput(idNumber, { onFieldChange(); onIdChange(it) },
-            "Número de identificación", "1234567890", Icons.Default.Badge)
-        THInput(password, { onFieldChange(); onPasswordChange(it) },
-            "Contraseña", "Mínimo 8 caracteres", Icons.Default.Lock, isPassword = true)
-        THInput(confirmPassword, { onFieldChange(); onConfirmChange(it) },
-            "Confirmar contraseña", "Repite tu contraseña", Icons.Default.Lock, isPassword = true)
-
-        if (errorMessage != null) {
-            Text(errorMessage, color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall)
-        }
+        Text(
+            "Información personal",
+            style = MaterialTheme.typography.headlineSmall
+        )
+        PersonalInfoFields(
+            firstName, lastName, email, phone, onClear,
+            onFirstName, onLastName, onEmail, onPhone
+        )
+        LocationFields(country, city, birthDate, onClear, onCountry, onCity, onBirthDate)
+        IdFields(idType, idNumber, onClear, onIdType, onIdNumber)
+        PasswordFields(password, confirmPassword, onClear, onPassword, onConfirm)
+        ErrorMessage(errorMessage)
         Spacer(Modifier.height(4.dp))
         SubmitButton(isLoading, onSubmit)
         LoginLink(onLogin)
+    }
+}
+
+@Suppress("LongParameterList")
+@Composable
+private fun PersonalInfoFields(
+    firstName: String, lastName: String, email: String, phone: String,
+    onClear: () -> Unit,
+    onFirstName: (String) -> Unit, onLastName: (String) -> Unit,
+    onEmail: (String) -> Unit, onPhone: (String) -> Unit
+) {
+    THInput(firstName, { onClear(); onFirstName(it) },
+        "Nombre *", "Juan", Icons.Default.Person)
+    THInput(lastName, { onClear(); onLastName(it) },
+        "Apellido *", "Pérez", Icons.Default.Person)
+    THInput(email, { onClear(); onEmail(it) },
+        "Email *", "tu@email.com", Icons.Default.Email)
+    THInput(phone, { onClear(); onPhone(it) },
+        "Teléfono *", "+57 300 123 4567", Icons.Default.Phone)
+}
+
+@Suppress("LongParameterList")
+@Composable
+private fun LocationFields(
+    country: String, city: String, birthDate: String,
+    onClear: () -> Unit,
+    onCountry: (String) -> Unit, onCity: (String) -> Unit,
+    onBirthDate: (String) -> Unit
+) {
+    THInput(country, { onClear(); onCountry(it) },
+        "País *", "Colombia", Icons.Default.Public)
+    THInput(city, { onClear(); onCity(it) },
+        "Ciudad *", "Bogotá", Icons.Default.LocationCity)
+    THDatePicker(birthDate, { onClear(); onBirthDate(it) },
+        "Fecha de nacimiento *")
+}
+
+@Composable
+private fun IdFields(
+    idType: String, idNumber: String, onClear: () -> Unit,
+    onIdType: (String) -> Unit, onIdNumber: (String) -> Unit
+) {
+    THDropdown(
+        idType, { onClear(); onIdType(it) },
+        "Tipo de ID *",
+        ID_TYPES.map { it.second },
+        Icons.Default.Badge
+    )
+    THInput(idNumber, { onClear(); onIdNumber(it) },
+        "Número de ID *", "1234567890", Icons.Default.Badge)
+}
+
+@Composable
+private fun PasswordFields(
+    password: String, confirmPassword: String, onClear: () -> Unit,
+    onPassword: (String) -> Unit, onConfirm: (String) -> Unit
+) {
+    THInput(password, { onClear(); onPassword(it) },
+        "Contraseña *", "Mínimo 8 caracteres", Icons.Default.Lock, isPassword = true)
+    THInput(confirmPassword, { onClear(); onConfirm(it) },
+        "Confirmar contraseña *", "Repite tu contraseña", Icons.Default.Lock, isPassword = true)
+}
+
+@Composable
+private fun ErrorMessage(errorMessage: String?) {
+    if (errorMessage != null) {
+        Text(
+            errorMessage, color = MaterialTheme.colorScheme.error,
+            style = MaterialTheme.typography.bodySmall
+        )
     }
 }
 
@@ -226,13 +325,19 @@ private fun SuccessDialog(onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = {},
         icon = {
-            Icon(Icons.Default.CheckCircle, null,
-                tint = SUCCESS_COLOR, modifier = Modifier.size(48.dp))
+            Icon(
+                Icons.Default.CheckCircle, null,
+                tint = SUCCESS_COLOR, modifier = Modifier.size(48.dp)
+            )
         },
-        title = { Text("¡Cuenta creada!", style = MaterialTheme.typography.headlineMedium) },
+        title = {
+            Text("¡Cuenta creada!", style = MaterialTheme.typography.headlineMedium)
+        },
         text = {
-            Text("Tu cuenta se ha registrado exitosamente. Ahora puedes iniciar sesión.",
-                style = MaterialTheme.typography.bodyLarge)
+            Text(
+                "Tu cuenta se ha registrado exitosamente. Ahora puedes iniciar sesión.",
+                style = MaterialTheme.typography.bodyLarge
+            )
         },
         confirmButton = {
             Button(

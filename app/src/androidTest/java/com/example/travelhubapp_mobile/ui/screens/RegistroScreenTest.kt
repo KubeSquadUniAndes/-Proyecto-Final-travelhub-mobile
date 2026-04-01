@@ -24,13 +24,14 @@ class RegistroScreenTest {
     @Test
     fun displaysTitle() {
         setScreen()
-        composeTestRule.onNodeWithText("Crear cuenta").assertIsDisplayed()
+        composeTestRule.onAllNodesWithText("Crear cuenta")[0].assertIsDisplayed()
     }
 
     @Test
     fun displaysSubtitle() {
         setScreen()
-        composeTestRule.onNodeWithText("Únete a TravelHub y descubre tu próximo destino").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Completa tus datos para continuar")
+            .assertIsDisplayed()
     }
 
     @Test
@@ -40,41 +41,82 @@ class RegistroScreenTest {
     }
 
     @Test
-    fun displaysNameLabel() {
+    fun displaysInfoHeader() {
         setScreen()
-        composeTestRule.onNodeWithText("Nombre completo").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Información personal").assertIsDisplayed()
+    }
+
+    @Test
+    fun displaysFirstNameLabel() {
+        setScreen()
+        composeTestRule.onNodeWithText("Nombre *").assertIsDisplayed()
+    }
+
+    @Test
+    fun displaysLastNameLabel() {
+        setScreen()
+        composeTestRule.onNodeWithText("Apellido *").assertIsDisplayed()
     }
 
     @Test
     fun displaysEmailLabel() {
         setScreen()
-        composeTestRule.onNodeWithText("Correo electrónico").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Email *").assertIsDisplayed()
     }
 
     @Test
     fun displaysPhoneLabel() {
         setScreen()
-        composeTestRule.onNodeWithText("Teléfono móvil").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Teléfono *").assertIsDisplayed()
+    }
+
+    @Test
+    fun displaysCountryLabel() {
+        setScreen()
+        composeTestRule.onNodeWithText("País *").assertExists()
+    }
+
+    @Test
+    fun displaysCityLabel() {
+        setScreen()
+        composeTestRule.onNodeWithText("Ciudad *").assertExists()
+    }
+
+    @Test
+    fun displaysBirthDateLabel() {
+        setScreen()
+        composeTestRule.onNodeWithText("Fecha de nacimiento *").assertExists()
+    }
+
+    @Test
+    fun displaysIdTypeLabel() {
+        setScreen()
+        composeTestRule.onNodeWithText("Tipo de ID *").assertExists()
+    }
+
+    @Test
+    fun displaysIdNumberLabel() {
+        setScreen()
+        composeTestRule.onNodeWithText("Número de ID *").assertExists()
     }
 
     @Test
     fun displaysPasswordLabel() {
         setScreen()
-        composeTestRule.onNodeWithText("Contraseña").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Contraseña *").assertExists()
     }
 
     @Test
     fun displaysConfirmPasswordLabel() {
         setScreen()
-        composeTestRule.onNodeWithText("Confirmar contraseña").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Confirmar contraseña *").assertExists()
     }
 
     @Test
-    fun displaysCreateAccountButton() {
+    fun displaysDefaultIdType() {
         setScreen()
-        // Scroll to make sure button is visible
-        composeTestRule.onNodeWithText("Crear cuenta", useUnmergedTree = true)
-            .assertExists()
+        composeTestRule.onNodeWithText("Cédula (CC)")
+            .performScrollTo().assertIsDisplayed()
     }
 
     @Test
@@ -84,30 +126,28 @@ class RegistroScreenTest {
     }
 
     @Test
-    fun displaysAlreadyHaveAccountText() {
+    fun firstNameField_acceptsInput() {
         setScreen()
-        composeTestRule.onNodeWithText("¿Ya tienes cuenta? ").assertExists()
+        composeTestRule.onAllNodes(hasSetTextAction())[0]
+            .performTextInput("Juan")
+        composeTestRule.onNodeWithText("Juan").assertIsDisplayed()
     }
 
     @Test
-    fun nameField_acceptsInput() {
+    fun lastNameField_acceptsInput() {
         setScreen()
-        composeTestRule.onAllNodes(hasSetTextAction())[0].performTextInput("Juan Pérez")
-        composeTestRule.onNodeWithText("Juan Pérez").assertIsDisplayed()
+        composeTestRule.onAllNodes(hasSetTextAction())[1]
+            .performTextInput("Pérez")
+        composeTestRule.onNodeWithText("Pérez").assertIsDisplayed()
     }
 
     @Test
-    fun emailField_acceptsInput() {
+    fun emptyFields_showsValidationError() {
         setScreen()
-        composeTestRule.onAllNodes(hasSetTextAction())[1].performTextInput("juan@mail.com")
-        composeTestRule.onNodeWithText("juan@mail.com").assertIsDisplayed()
-    }
-
-    @Test
-    fun phoneField_acceptsInput() {
-        setScreen()
-        composeTestRule.onAllNodes(hasSetTextAction())[2].performTextInput("3001234567")
-        composeTestRule.onNodeWithText("3001234567").assertIsDisplayed()
+        composeTestRule.onAllNodesWithText("Crear cuenta")[1]
+            .performScrollTo().performClick()
+        composeTestRule.onNodeWithText("Completa todos los campos")
+            .assertIsDisplayed()
     }
 
     @Test
@@ -122,25 +162,8 @@ class RegistroScreenTest {
     fun loginLink_callsCallback() {
         var clicked = false
         setScreen(onLogin = { clicked = true })
-        composeTestRule.onNodeWithText("Inicia sesión").performClick()
+        composeTestRule.onNodeWithText("Inicia sesión")
+            .performScrollTo().performClick()
         assert(clicked)
-    }
-
-    @Test
-    fun displaysNamePlaceholder() {
-        setScreen()
-        composeTestRule.onNodeWithText("Juan Pérez García").assertIsDisplayed()
-    }
-
-    @Test
-    fun displaysEmailPlaceholder() {
-        setScreen()
-        composeTestRule.onNodeWithText("correo@ejemplo.com").assertIsDisplayed()
-    }
-
-    @Test
-    fun displaysPhonePlaceholder() {
-        setScreen()
-        composeTestRule.onNodeWithText("3001234567").assertIsDisplayed()
     }
 }

@@ -8,13 +8,13 @@ data class RegisterRequest(
     @SerializedName("last_name") val lastName: String,
     val email: String,
     val phone: String,
-    val country: String = "Colombia",
-    val city: String = "Bogotá",
-    @SerializedName("birth_date") val birthDate: String = "1995-01-01",
+    val country: String,
+    val city: String,
+    @SerializedName("birth_date") val birthDate: String,
     val password: String,
     @SerializedName("user_type") val userType: String = "traveler",
-    @SerializedName("identification_type") val identificationType: String = "CC",
-    @SerializedName("identification_number") val identificationNumber: String = ""
+    @SerializedName("identification_type") val identificationType: String,
+    @SerializedName("identification_number") val identificationNumber: String
 )
 
 data class RegisterResponse(

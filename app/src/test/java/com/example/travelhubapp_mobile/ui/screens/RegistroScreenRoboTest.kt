@@ -1,7 +1,16 @@
 package com.example.travelhubapp_mobile.ui.screens
 
-import androidx.compose.ui.test.*
+import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onFirst
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performTextInput
 import com.example.travelhubapp_mobile.ui.theme.TravelHubAppMobileTheme
 import org.junit.Rule
 import org.junit.Test
@@ -16,8 +25,14 @@ class RegistroScreenRoboTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private fun setScreen(onRegister: () -> Unit = {}, onLogin: () -> Unit = {}, onBack: () -> Unit = {}) {
-        composeTestRule.setContent { TravelHubAppMobileTheme { RegistroScreen(onRegister, onLogin, onBack) } }
+    private fun setScreen(
+        onRegister: () -> Unit = {},
+        onLogin: () -> Unit = {},
+        onBack: () -> Unit = {}
+    ) {
+        composeTestRule.setContent {
+            TravelHubAppMobileTheme { RegistroScreen(onRegister, onLogin, onBack) }
+        }
     }
 
     @Test
@@ -29,7 +44,7 @@ class RegistroScreenRoboTest {
     @Test
     fun displaysSubtitle() {
         setScreen()
-        composeTestRule.onNodeWithText("Únete a TravelHub y descubre tu próximo destino").assertExists()
+        composeTestRule.onNodeWithText("Completa tus datos para continuar").assertExists()
     }
 
     @Test
@@ -39,39 +54,75 @@ class RegistroScreenRoboTest {
     }
 
     @Test
-    fun displaysNameLabel() {
+    fun displaysFirstNameLabel() {
         setScreen()
-        composeTestRule.onNodeWithText("Nombre completo").assertExists()
+        composeTestRule.onNodeWithText("Nombre *").assertExists()
+    }
+
+    @Test
+    fun displaysLastNameLabel() {
+        setScreen()
+        composeTestRule.onNodeWithText("Apellido *").assertExists()
     }
 
     @Test
     fun displaysEmailLabel() {
         setScreen()
-        composeTestRule.onNodeWithText("Correo electrónico").assertExists()
+        composeTestRule.onNodeWithText("Email *").assertExists()
     }
 
     @Test
     fun displaysPhoneLabel() {
         setScreen()
-        composeTestRule.onNodeWithText("Teléfono móvil").assertExists()
+        composeTestRule.onNodeWithText("Teléfono *").assertExists()
+    }
+
+    @Test
+    fun displaysCountryLabel() {
+        setScreen()
+        composeTestRule.onNodeWithText("País *").assertExists()
+    }
+
+    @Test
+    fun displaysCityLabel() {
+        setScreen()
+        composeTestRule.onNodeWithText("Ciudad *").assertExists()
+    }
+
+    @Test
+    fun displaysBirthDateLabel() {
+        setScreen()
+        composeTestRule.onNodeWithText("Fecha de nacimiento *").assertExists()
+    }
+
+    @Test
+    fun displaysIdTypeLabel() {
+        setScreen()
+        composeTestRule.onNodeWithText("Tipo de ID *").assertExists()
     }
 
     @Test
     fun displaysIdNumberLabel() {
         setScreen()
-        composeTestRule.onNodeWithText("Número de identificación").assertExists()
+        composeTestRule.onNodeWithText("Número de ID *").assertExists()
     }
 
     @Test
     fun displaysPasswordLabel() {
         setScreen()
-        composeTestRule.onNodeWithText("Contraseña").assertExists()
+        composeTestRule.onNodeWithText("Contraseña *").assertExists()
     }
 
     @Test
     fun displaysConfirmPasswordLabel() {
         setScreen()
-        composeTestRule.onNodeWithText("Confirmar contraseña").assertExists()
+        composeTestRule.onNodeWithText("Confirmar contraseña *").assertExists()
+    }
+
+    @Test
+    fun displaysInfoHeader() {
+        setScreen()
+        composeTestRule.onNodeWithText("Información personal").assertExists()
     }
 
     @Test
@@ -87,43 +138,24 @@ class RegistroScreenRoboTest {
     }
 
     @Test
-    fun displaysAlreadyHaveAccountText() {
+    fun firstNameField_acceptsInput() {
         setScreen()
-        composeTestRule.onNodeWithText("¿Ya tienes cuenta? ").assertExists()
+        composeTestRule.onAllNodes(hasSetTextAction())[0].performTextInput("Juan")
+        composeTestRule.onNodeWithText("Juan").assertExists()
     }
 
     @Test
-    fun nameField_acceptsInput() {
+    fun lastNameField_acceptsInput() {
         setScreen()
-        composeTestRule.onAllNodes(hasSetTextAction())[0].performTextInput("Juan Pérez")
-        composeTestRule.onNodeWithText("Juan Pérez").assertExists()
-    }
-
-    @Test
-    fun emailField_acceptsInput() {
-        setScreen()
-        composeTestRule.onAllNodes(hasSetTextAction())[1].performTextInput("juan@mail.com")
-        composeTestRule.onNodeWithText("juan@mail.com").assertExists()
-    }
-
-    @Test
-    fun phoneField_acceptsInput() {
-        setScreen()
-        composeTestRule.onAllNodes(hasSetTextAction())[2].performTextInput("3009999999")
-        composeTestRule.onNodeWithText("3009999999").assertExists()
-    }
-
-    @Test
-    fun idNumberField_acceptsInput() {
-        setScreen()
-        composeTestRule.onAllNodes(hasSetTextAction())[3].performTextInput("1234567890")
-        composeTestRule.onNodeWithText("1234567890").assertExists()
+        composeTestRule.onAllNodes(hasSetTextAction())[1].performTextInput("Pérez")
+        composeTestRule.onNodeWithText("Pérez").assertExists()
     }
 
     @Test
     fun emptyFields_showsError() {
         setScreen()
-        composeTestRule.onAllNodesWithText("Crear cuenta")[1].performScrollTo().performClick()
+        composeTestRule.onAllNodesWithText("Crear cuenta")[1]
+            .performScrollTo().performClick()
         composeTestRule.onNodeWithText("Completa todos los campos").assertExists()
     }
 
@@ -139,25 +171,14 @@ class RegistroScreenRoboTest {
     fun loginLink_callsCallback() {
         var clicked = false
         setScreen(onLogin = { clicked = true })
-        composeTestRule.onNodeWithText("Inicia sesión").performScrollTo().performClick()
+        composeTestRule.onNodeWithText("Inicia sesión")
+            .performScrollTo().performClick()
         assert(clicked)
     }
 
     @Test
-    fun displaysNamePlaceholder() {
+    fun displaysDefaultIdType() {
         setScreen()
-        composeTestRule.onNodeWithText("Juan Pérez García").assertExists()
-    }
-
-    @Test
-    fun displaysEmailPlaceholder() {
-        setScreen()
-        composeTestRule.onNodeWithText("correo@ejemplo.com").assertExists()
-    }
-
-    @Test
-    fun displaysIdNumberPlaceholder() {
-        setScreen()
-        composeTestRule.onNodeWithText("1234567890").assertExists()
+        composeTestRule.onNodeWithText("Cédula (CC)").assertIsDisplayed()
     }
 }
