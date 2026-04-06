@@ -15,12 +15,17 @@ class AuthRepository(private val tokenManager: TokenManager) {
 
     private val api = RetrofitClient.api
 
+    @Suppress("LongParameterList")
     suspend fun register(
         firstName: String,
         lastName: String,
         email: String,
         phone: String,
         password: String,
+        country: String,
+        city: String,
+        birthDate: String,
+        identificationType: String,
         identificationNumber: String
     ): AuthResult<String> {
         return try {
@@ -31,6 +36,10 @@ class AuthRepository(private val tokenManager: TokenManager) {
                     email = email,
                     phone = phone,
                     password = password,
+                    country = country,
+                    city = city,
+                    birthDate = birthDate,
+                    identificationType = identificationType,
                     identificationNumber = identificationNumber
                 )
             )

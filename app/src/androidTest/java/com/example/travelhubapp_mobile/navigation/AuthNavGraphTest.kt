@@ -37,8 +37,8 @@ class AuthNavGraphTest {
             TravelHubAppMobileTheme { AuthNavGraph() }
         }
         composeTestRule.onNodeWithText("Registrarme como viajero").performClick()
-        composeTestRule.onNodeWithText("Crear cuenta").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Nombre completo").assertIsDisplayed()
+        composeTestRule.onAllNodesWithText("Crear cuenta").onFirst().assertIsDisplayed()
+        composeTestRule.onNodeWithText("Nombre *").assertIsDisplayed()
     }
 
     @Test
@@ -47,8 +47,9 @@ class AuthNavGraphTest {
             TravelHubAppMobileTheme { AuthNavGraph() }
         }
         composeTestRule.onNodeWithText("Iniciar sesión").performClick()
-        composeTestRule.onNodeWithText("Crear cuenta nueva").performClick()
-        composeTestRule.onNodeWithText("Crear cuenta").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Crear cuenta nueva")
+            .performScrollTo().performClick()
+        composeTestRule.onAllNodesWithText("Crear cuenta").onFirst().assertIsDisplayed()
     }
 
     @Test
@@ -57,7 +58,8 @@ class AuthNavGraphTest {
             TravelHubAppMobileTheme { AuthNavGraph() }
         }
         composeTestRule.onNodeWithText("Registrarme como viajero").performClick()
-        composeTestRule.onNodeWithText("Inicia sesión").performClick()
+        composeTestRule.onNodeWithText("Inicia sesión")
+            .performScrollTo().performClick()
         composeTestRule.onNodeWithText("Bienvenido de nuevo").assertIsDisplayed()
     }
 

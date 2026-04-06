@@ -66,36 +66,40 @@ class LoginScreenTest {
     @Test
     fun displaysTermsText() {
         setScreen()
-        composeTestRule.onNodeWithText("Al continuar, aceptas nuestros Términos de servicio y Política de privacidad")
-            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(
+            "Al continuar, aceptas nuestros Términos de servicio y Política de privacidad"
+        ).assertIsDisplayed()
     }
 
     @Test
     fun emailField_acceptsInput() {
         setScreen()
-        composeTestRule.onAllNodes(hasSetTextAction())[0].performTextInput("test@mail.com")
+        composeTestRule.onAllNodes(hasSetTextAction())[0]
+            .performTextInput("test@mail.com")
         composeTestRule.onNodeWithText("test@mail.com").assertIsDisplayed()
     }
 
     @Test
     fun passwordField_acceptsInput() {
         setScreen()
-        composeTestRule.onAllNodes(hasSetTextAction())[1].performTextInput("password123")
+        composeTestRule.onAllNodes(hasSetTextAction())[1]
+            .performTextInput("password123")
     }
 
     @Test
-    fun loginButton_callsCallback() {
-        var clicked = false
-        setScreen(onLogin = { clicked = true })
-        composeTestRule.onNodeWithText("Iniciar sesión").performClick()
-        assert(clicked)
+    fun emptyFields_showsValidationError() {
+        setScreen()
+        composeTestRule.onNodeWithText("Iniciar sesión")
+            .performScrollTo().performClick()
+        composeTestRule.onNodeWithText("Completa todos los campos").assertIsDisplayed()
     }
 
     @Test
     fun createAccountLink_callsCallback() {
         var clicked = false
         setScreen(onRegister = { clicked = true })
-        composeTestRule.onNodeWithText("Crear cuenta nueva").performClick()
+        composeTestRule.onNodeWithText("Crear cuenta nueva")
+            .performScrollTo().performClick()
         assert(clicked)
     }
 

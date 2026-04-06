@@ -64,7 +64,8 @@ class AuthRepositoryTest {
     @Test
     fun register_failsWithInvalidServer() = runBlocking {
         val result = authRepository.register(
-            "Test", "User", "t@t.com", "123", "pass123!", "999"
+            "Test", "User", "t@t.com", "123", "pass123!",
+            "Colombia", "Bogotá", "1995-01-01", "CC", "999"
         )
         assertTrue(result is AuthResult.Error)
     }

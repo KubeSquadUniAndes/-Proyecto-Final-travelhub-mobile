@@ -15,24 +15,28 @@ class ModelsTest {
         val request = RegisterRequest(
             firstName = "Juan", lastName = "Pérez",
             email = "juan@test.com", phone = "+57 300 123 4567",
-            password = "SecurePass123!", identificationNumber = "1234567890"
+            password = "SecurePass123!", identificationNumber = "1234567890",
+            country = "Colombia", city = "Bogotá",
+            birthDate = "1995-06-15", identificationType = "CC"
         )
         val json = gson.toJson(request)
         assertTrue(json.contains("\"first_name\":\"Juan\""))
         assertTrue(json.contains("\"last_name\":\"Pérez\""))
         assertTrue(json.contains("\"identification_number\":\"1234567890\""))
+        assertTrue(json.contains("\"country\":\"Colombia\""))
+        assertTrue(json.contains("\"birth_date\":\"1995-06-15\""))
     }
 
     @Test
-    fun registerRequest_hasDefaultValues() {
+    fun registerRequest_hasDefaultUserType() {
         val request = RegisterRequest(
             firstName = "Test", lastName = "User",
-            email = "t@t.com", phone = "123", password = "pass"
+            email = "t@t.com", phone = "123", password = "pass",
+            country = "Colombia", city = "Bogotá",
+            birthDate = "2000-01-01", identificationType = "CC",
+            identificationNumber = "999"
         )
-        assertEquals("Colombia", request.country)
-        assertEquals("Bogotá", request.city)
         assertEquals("traveler", request.userType)
-        assertEquals("CC", request.identificationType)
     }
 
     @Test
