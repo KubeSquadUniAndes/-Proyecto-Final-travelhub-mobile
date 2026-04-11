@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
 
-    private const val BASE_URL = "http://a9b5d9c8186fe4cdf9f98e6d8d545afe-66213202.us-east-1.elb.amazonaws.com/"
+    private const val BASE_URL = "http://ac579e79af7f644ea9a28fcf0b880a47-b476310f4eeda9e2.elb.us-east-1.amazonaws.com/"
 
     private val hostInterceptor = Interceptor { chain ->
         val request = chain.request().newBuilder()
