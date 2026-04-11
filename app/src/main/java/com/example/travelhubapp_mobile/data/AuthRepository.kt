@@ -59,25 +59,25 @@ class AuthRepository(private val tokenManager: TokenManager) {
             val response = api.login(LoginRequest(email, password))
             if (response.isSuccessful) {
                 val token = response.body()?.accessToken
-                if (token != null) {
-                    tokenManager.saveToken(token)
-                    val profileResponse = api.getProfile("Bearer $token")
-                    val role = profileResponse.body()?.role
-                    if (role == "hotel") {
-                        tokenManager.clearToken()
-                        AuthResult.Error("Acceso denegado: esta app es solo para viajeros")
-                    } else {
-                        AuthResult.Success(token)
-                    }
-                } else {
-                    AuthResult.Error("No se recibió token")
-                }
+                    ?: return AuthResult.Error("No se recibió token")
+                tokenManager.saveToken(token)
+                checkRole(token)
             } else {
                 val error = response.errorBody()?.string() ?: "Credenciales inválidas"
                 AuthResult.Error(error)
             }
         } catch (e: IOException) {
             AuthResult.Error("Error de conexión: ${e.message}")
+        }
+    }
+
+    private suspend fun checkRole(token: String): AuthResult<String> {
+        val role = api.getProfile("Bearer $token").body()?.role
+        return if (role == "hotel") {
+            tokenManager.clearToken()
+            AuthResult.Error("Acceso denegado: esta app es solo para viajeros")
+        } else {
+            AuthResult.Success(token)
         }
     }
 

@@ -9,6 +9,9 @@ import com.example.travelhubapp_mobile.ui.screens.*
 @Composable
 fun AuthNavGraph() {
     val navController = rememberNavController()
+    val logout: () -> Unit = {
+        navController.navigate(Routes.BIENVENIDA) { popUpTo(0) { inclusive = true } }
+    }
 
     NavHost(navController = navController, startDestination = Routes.BIENVENIDA) {
         composable(Routes.BIENVENIDA) {
@@ -17,58 +20,30 @@ fun AuthNavGraph() {
                 onRegistro = { navController.navigate(Routes.REGISTRO) }
             )
         }
-
         composable(Routes.LOGIN) {
             LoginScreen(
-                onLogin = {
-                    navController.navigate(Routes.HOME) {
-                        popUpTo(Routes.BIENVENIDA) { inclusive = true }
-                    }
-                },
-                onRegister = {
-                    navController.navigate(Routes.REGISTRO) {
-                        popUpTo(Routes.LOGIN) { inclusive = true }
-                    }
-                },
+                onLogin = { navController.navigate(Routes.HOME) { popUpTo(Routes.BIENVENIDA) { inclusive = true } } },
+                onRegister = { navController.navigate(Routes.REGISTRO) { popUpTo(Routes.LOGIN) { inclusive = true } } },
                 onBack = { navController.popBackStack() }
             )
         }
-
         composable(Routes.REGISTRO) {
             RegistroScreen(
-                onRegister = {
-                    navController.navigate(Routes.LOGIN) {
-                        popUpTo(Routes.REGISTRO) { inclusive = true }
-                    }
-                },
-                onLogin = {
-                    navController.navigate(Routes.LOGIN) {
-                        popUpTo(Routes.REGISTRO) { inclusive = true }
-                    }
-                },
+                onRegister = { navController.navigate(Routes.LOGIN) { popUpTo(Routes.REGISTRO) { inclusive = true } } },
+                onLogin = { navController.navigate(Routes.LOGIN) { popUpTo(Routes.REGISTRO) { inclusive = true } } },
                 onBack = { navController.popBackStack() }
             )
         }
-
         composable(Routes.HOME) {
             HomeScreen(
                 onPerfil = { navController.navigate(Routes.PERFIL) },
-                onLogout = {
-                    navController.navigate(Routes.BIENVENIDA) {
-                        popUpTo(0) { inclusive = true }
-                    }
-                }
+                onLogout = logout
             )
         }
-
         composable(Routes.PERFIL) {
             PerfilScreen(
                 onHome = { navController.popBackStack() },
-                onLogout = {
-                    navController.navigate(Routes.BIENVENIDA) {
-                        popUpTo(0) { inclusive = true }
-                    }
-                }
+                onLogout = logout
             )
         }
     }

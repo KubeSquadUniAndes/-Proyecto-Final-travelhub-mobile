@@ -83,18 +83,23 @@ fun HomeScreen(onReservar: () -> Unit = {}, onPerfil: () -> Unit = {}, onLogout:
         bottomBar = {
             THBottomBar(
                 selected = selectedTab,
-                onSelect = { tab ->
-                    selectedTab = tab
-                    if (tab == 1) onPerfil()
-                },
+                onSelect = { tab -> selectedTab = tab; if (tab == 1) onPerfil() },
                 onLogout = onLogout
             )
         }
     ) { innerPadding ->
-        Column(
-            Modifier.fillMaxSize().background(White)
-                .padding(innerPadding)
-        ) {
+        HomeContent(isLoading, lista, onReservar, Modifier.padding(innerPadding))
+    }
+}
+
+@Composable
+private fun HomeContent(
+    isLoading: Boolean,
+    lista: List<Hospedaje>,
+    onReservar: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier.fillMaxSize().background(White)) {
         Column(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -102,7 +107,6 @@ fun HomeScreen(onReservar: () -> Unit = {}, onPerfil: () -> Unit = {}, onLogout:
             Text("TravelHub", style = MaterialTheme.typography.headlineLarge, color = Blue600)
             Text("Hospedajes disponibles", style = MaterialTheme.typography.titleMedium, color = Gray600)
         }
-
         if (isLoading) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Column(
@@ -126,13 +130,10 @@ fun HomeScreen(onReservar: () -> Unit = {}, onPerfil: () -> Unit = {}, onLogout:
                         color = Gray500
                     )
                 }
-                items(lista, key = { it.id }) { hospedaje ->
-                    HospedajeCard(hospedaje, onReservar)
-                }
+                items(lista, key = { it.id }) { hospedaje -> HospedajeCard(hospedaje, onReservar) }
                 item { Spacer(Modifier.height(16.dp)) }
             }
         }
-    }
     }
 }
 
