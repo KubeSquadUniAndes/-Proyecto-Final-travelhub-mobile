@@ -61,7 +61,14 @@ class AuthRepository(private val tokenManager: TokenManager) {
                 val token = response.body()?.accessToken
                 if (token != null) {
                     tokenManager.saveToken(token)
-                    AuthResult.Success(token)
+                    val profileResponse = api.getProfile("Bearer $token")
+                    val role = profileResponse.body()?.role
+                    if (role == "hotel") {
+                        tokenManager.clearToken()
+                        AuthResult.Error("Acceso denegado: esta app es solo para viajeros")
+                    } else {
+                        AuthResult.Success(token)
+                    }
                 } else {
                     AuthResult.Error("No se recibió token")
                 }
