@@ -52,6 +52,18 @@ fun AuthNavGraph() {
 
         composable(Routes.HOME) {
             HomeScreen(
+                onPerfil = { navController.navigate(Routes.PERFIL) },
+                onLogout = {
+                    navController.navigate(Routes.BIENVENIDA) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        composable(Routes.PERFIL) {
+            PerfilScreen(
+                onHome = { navController.popBackStack() },
                 onLogout = {
                     navController.navigate(Routes.BIENVENIDA) {
                         popUpTo(0) { inclusive = true }
