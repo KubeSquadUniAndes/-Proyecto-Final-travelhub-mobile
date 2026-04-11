@@ -18,7 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
@@ -300,7 +300,7 @@ fun THBottomBar(selected: Int, onSelect: (Int) -> Unit, onLogout: () -> Unit) {
         NavigationBarItem(
             selected = false,
             onClick = onLogout,
-            icon = { Icon(Icons.Default.ExitToApp, "Cerrar sesión", modifier = Modifier.size(23.dp)) },
+            icon = { Icon(Icons.AutoMirrored.Filled.ExitToApp, "Cerrar sesión", modifier = Modifier.size(23.dp)) },
             label = { Text("Salir", style = MaterialTheme.typography.labelSmall) },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = Blue600, selectedTextColor = Blue600,

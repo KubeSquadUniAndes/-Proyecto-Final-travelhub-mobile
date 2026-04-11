@@ -3,6 +3,7 @@ package com.example.travelhubapp_mobile.ui.screens
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performScrollTo
 import com.example.travelhubapp_mobile.ui.theme.TravelHubAppMobileTheme
 import org.junit.Rule
 import org.junit.Test
@@ -56,7 +57,8 @@ class HomeScreenRoboTest {
             TravelHubAppMobileTheme { HomeScreen() }
         }
         composeTestRule.mainClock.advanceTimeBy(2000)
-        composeTestRule.onNodeWithText("Reservar").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Reservar")
+            .performScrollTo().assertIsDisplayed()
     }
 
     @Test
@@ -74,7 +76,8 @@ class HomeScreenRoboTest {
             TravelHubAppMobileTheme { HomeScreen() }
         }
         composeTestRule.mainClock.advanceTimeBy(2000)
-        composeTestRule.onNodeWithText("Bogotá, Colombia").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Bogotá, Colombia")
+            .performScrollTo().assertIsDisplayed()
     }
 
     @Test
@@ -83,6 +86,7 @@ class HomeScreenRoboTest {
             TravelHubAppMobileTheme { HomeScreen() }
         }
         composeTestRule.mainClock.advanceTimeBy(2000)
-        composeTestRule.onNodeWithText("COP 600,000").assertIsDisplayed()
+        composeTestRule.onNodeWithText("COP 600,000")
+            .performScrollTo().assertIsDisplayed()
     }
 }
