@@ -47,5 +47,6 @@ data class ProfileResponse(
     @SerializedName("user_type") val userType: String?,
     val country: String?,
     val city: String?,
-    val status: String?
+    val status: String?,
+    val role: String?
 )
