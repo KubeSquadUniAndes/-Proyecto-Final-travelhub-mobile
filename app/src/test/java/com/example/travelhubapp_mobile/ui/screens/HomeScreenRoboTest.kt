@@ -3,6 +3,7 @@ package com.example.travelhubapp_mobile.ui.screens
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performScrollTo
 import com.example.travelhubapp_mobile.ui.theme.TravelHubAppMobileTheme
 import org.junit.Rule
 import org.junit.Test
@@ -18,19 +19,74 @@ class HomeScreenRoboTest {
     val composeTestRule = createComposeRule()
 
     @Test
-    fun displaysProfileHeader() {
+    fun displaysTitle() {
         composeTestRule.setContent {
-            TravelHubAppMobileTheme { HomeScreen(onLogout = {}) }
+            TravelHubAppMobileTheme { HomeScreen() }
         }
-        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("TravelHub").assertIsDisplayed()
     }
 
     @Test
-    fun displaysLogoutButton() {
+    fun displaysSubtitle() {
         composeTestRule.setContent {
-            TravelHubAppMobileTheme { HomeScreen(onLogout = {}) }
+            TravelHubAppMobileTheme { HomeScreen() }
         }
-        composeTestRule.waitForIdle()
-        composeTestRule.onNodeWithText("Cerrar sesión").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Hospedajes disponibles").assertIsDisplayed()
+    }
+
+    @Test
+    fun displaysLoadingIndicator() {
+        composeTestRule.setContent {
+            TravelHubAppMobileTheme { HomeScreen() }
+        }
+        composeTestRule.onNodeWithText("Cargando hospedajes...").assertIsDisplayed()
+    }
+
+    @Test
+    fun displaysHospedajesAfterLoading() {
+        composeTestRule.setContent {
+            TravelHubAppMobileTheme { HomeScreen() }
+        }
+        composeTestRule.mainClock.advanceTimeBy(2000)
+        composeTestRule.onNodeWithText("Hotel Grand Luxury").assertIsDisplayed()
+    }
+
+    @Test
+    fun displaysReservarButton() {
+        composeTestRule.setContent {
+            TravelHubAppMobileTheme { HomeScreen() }
+        }
+        composeTestRule.mainClock.advanceTimeBy(2000)
+        composeTestRule.onNodeWithText("Reservar")
+            .performScrollTo().assertIsDisplayed()
+    }
+
+    @Test
+    fun displaysHospedajeCount() {
+        composeTestRule.setContent {
+            TravelHubAppMobileTheme { HomeScreen() }
+        }
+        composeTestRule.mainClock.advanceTimeBy(2000)
+        composeTestRule.onNodeWithText("5 hospedajes disponibles").assertIsDisplayed()
+    }
+
+    @Test
+    fun displaysHospedajeLocation() {
+        composeTestRule.setContent {
+            TravelHubAppMobileTheme { HomeScreen() }
+        }
+        composeTestRule.mainClock.advanceTimeBy(2000)
+        composeTestRule.onNodeWithText("Bogotá, Colombia")
+            .performScrollTo().assertIsDisplayed()
+    }
+
+    @Test
+    fun displaysHospedajePrice() {
+        composeTestRule.setContent {
+            TravelHubAppMobileTheme { HomeScreen() }
+        }
+        composeTestRule.mainClock.advanceTimeBy(2000)
+        composeTestRule.onNodeWithText("COP 600,000")
+            .performScrollTo().assertIsDisplayed()
     }
 }
