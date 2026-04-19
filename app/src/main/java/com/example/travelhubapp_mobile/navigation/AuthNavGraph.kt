@@ -36,6 +36,7 @@ fun AuthNavGraph() {
         }
         composable(Routes.HOME) {
             HomeScreen(
+                onReservar = { navController.navigate(Routes.RESERVA) },
                 onPerfil = { navController.navigate(Routes.PERFIL) },
                 onLogout = logout
             )
@@ -44,6 +45,11 @@ fun AuthNavGraph() {
             PerfilScreen(
                 onHome = { navController.popBackStack() },
                 onLogout = logout
+            )
+        }
+        composable(Routes.RESERVA) {
+            ReservaScreen(
+                onBack = { navController.popBackStack() }
             )
         }
     }
