@@ -59,6 +59,7 @@ import com.example.travelhubapp_mobile.ui.theme.Gray400
 import com.example.travelhubapp_mobile.ui.theme.Gray600
 import com.example.travelhubapp_mobile.ui.theme.Gray700
 import com.example.travelhubapp_mobile.ui.theme.White
+import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
@@ -182,13 +183,26 @@ fun THDatePicker(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
+    placeholder: String = "dd/mm/aaaa",
+    minDate: Long? = null,
+    maxDate: Long? = null,
+    initialDate: Long? = null,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    val calendar = Calendar.getInstance()
-
+    
     val showDialog = {
-        DatePickerDialog(
+        val calendar = Calendar.getInstance()
+        if (value.isNotBlank()) {
+            try {
+                val date = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).parse(value)
+                if (date != null) calendar.time = date
+            } catch (_: Exception) {}
+        } else if (initialDate != null) {
+            calendar.timeInMillis = initialDate
+        }
+
+        val dpd = DatePickerDialog(
             context,
             { _, year, month, day ->
                 val formatted = String.format(
@@ -196,10 +210,13 @@ fun THDatePicker(
                 )
                 onValueChange(formatted)
             },
-            calendar.get(Calendar.YEAR) - 25,
+            calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH),
             calendar.get(Calendar.DAY_OF_MONTH)
-        ).show()
+        )
+        minDate?.let { dpd.datePicker.minDate = it }
+        maxDate?.let { dpd.datePicker.maxDate = it }
+        dpd.show()
     }
 
     Column(
@@ -213,7 +230,7 @@ fun THDatePicker(
                 onValueChange = {},
                 readOnly = true,
                 enabled = false,
-                placeholder = { Text("dd/mm/aaaa", color = Gray400) },
+                placeholder = { Text(placeholder, color = Gray400) },
                 leadingIcon = {
                     Icon(
                         Icons.Default.CalendarMonth, null,
