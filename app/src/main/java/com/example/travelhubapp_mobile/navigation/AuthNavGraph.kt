@@ -71,7 +71,8 @@ fun AuthNavGraph() {
         }
         composable(Routes.RESERVA) {
             ReservaScreen(
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                viewModel = hotelViewModel
             )
         }
     }
