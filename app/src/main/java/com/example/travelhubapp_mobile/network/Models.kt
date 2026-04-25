@@ -50,3 +50,21 @@ data class ProfileResponse(
     val status: String?,
     val role: String?
 )
+
+// === Hotels ===
+data class HotelSearchRequest(
+    val destination: String,
+    val checkIn: String,
+    val checkOut: String,
+    val guests: Int = 2
+)
+
+data class HotelResponse(
+    val id: String,
+    val name: String,
+    val rating: String,
+    val price: String,
+    val reviews: String?,
+    val location: String?,
+    val image: String?
+)

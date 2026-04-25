@@ -4,11 +4,14 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.travelhubapp_mobile.ui.viewmodels.HotelViewModel
 import com.example.travelhubapp_mobile.ui.screens.*
 
 @Composable
 fun AuthNavGraph() {
     val navController = rememberNavController()
+    val hotelViewModel: HotelViewModel = viewModel()
     val logout: () -> Unit = {
         navController.navigate(Routes.BIENVENIDA) { popUpTo(0) { inclusive = true } }
     }
@@ -36,15 +39,23 @@ fun AuthNavGraph() {
         }
         composable(Routes.HOME) {
             HomeScreen(
-                onReservar = { navController.navigate(Routes.RESERVA) },
+                onReservar = { navController.navigate(Routes.BUSCAR_HOTELES) },
                 onPerfil = { navController.navigate(Routes.PERFIL) },
-                onLogout = logout
+                onLogout = logout,
+                viewModel = hotelViewModel
             )
         }
         composable(Routes.PERFIL) {
             PerfilScreen(
                 onHome = { navController.popBackStack() },
                 onLogout = logout
+            )
+        }
+        composable(Routes.BUSCAR_HOTELES) {
+            BuscarHotelesScreen(
+                onBack = { navController.popBackStack() },
+                onHotelClick = { navController.navigate(Routes.RESERVA) },
+                viewModel = hotelViewModel
             )
         }
         composable(Routes.RESERVA) {

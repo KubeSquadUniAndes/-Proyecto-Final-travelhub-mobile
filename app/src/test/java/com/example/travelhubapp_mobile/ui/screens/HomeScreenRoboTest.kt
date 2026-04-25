@@ -21,7 +21,13 @@ class HomeScreenRoboTest {
     @Test
     fun displaysTitle() {
         composeTestRule.setContent {
-            TravelHubAppMobileTheme { HomeScreen() }
+            TravelHubAppMobileTheme {
+                HomeScreen(
+                    onReservar = {},
+                    onPerfil = {},
+                    onLogout = {}
+                )
+            }
         }
         composeTestRule.onNodeWithText("TravelHub").assertIsDisplayed()
     }
@@ -29,64 +35,32 @@ class HomeScreenRoboTest {
     @Test
     fun displaysSubtitle() {
         composeTestRule.setContent {
-            TravelHubAppMobileTheme { HomeScreen() }
+            TravelHubAppMobileTheme {
+                HomeScreen(
+                    onReservar = {},
+                    onPerfil = {},
+                    onLogout = {}
+                )
+            }
         }
-        composeTestRule.onNodeWithText("Hospedajes disponibles").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Encuentra tu hotel ideal").assertIsDisplayed()
     }
 
     @Test
-    fun displaysLoadingIndicator() {
+    fun displaysSearchForm() {
         composeTestRule.setContent {
-            TravelHubAppMobileTheme { HomeScreen() }
+            TravelHubAppMobileTheme {
+                HomeScreen(
+                    onReservar = {},
+                    onPerfil = {},
+                    onLogout = {}
+                )
+            }
         }
-        composeTestRule.onNodeWithText("Cargando hospedajes...").assertIsDisplayed()
-    }
-
-    @Test
-    fun displaysHospedajesAfterLoading() {
-        composeTestRule.setContent {
-            TravelHubAppMobileTheme { HomeScreen() }
-        }
-        composeTestRule.mainClock.advanceTimeBy(2000)
-        composeTestRule.onNodeWithText("Hotel Grand Luxury").assertIsDisplayed()
-    }
-
-    @Test
-    fun displaysReservarButton() {
-        composeTestRule.setContent {
-            TravelHubAppMobileTheme { HomeScreen() }
-        }
-        composeTestRule.mainClock.advanceTimeBy(2000)
-        composeTestRule.onNodeWithText("Reservar")
-            .performScrollTo().assertIsDisplayed()
-    }
-
-    @Test
-    fun displaysHospedajeCount() {
-        composeTestRule.setContent {
-            TravelHubAppMobileTheme { HomeScreen() }
-        }
-        composeTestRule.mainClock.advanceTimeBy(2000)
-        composeTestRule.onNodeWithText("5 hospedajes disponibles").assertIsDisplayed()
-    }
-
-    @Test
-    fun displaysHospedajeLocation() {
-        composeTestRule.setContent {
-            TravelHubAppMobileTheme { HomeScreen() }
-        }
-        composeTestRule.mainClock.advanceTimeBy(2000)
-        composeTestRule.onNodeWithText("Bogotá, Colombia")
-            .performScrollTo().assertIsDisplayed()
-    }
-
-    @Test
-    fun displaysHospedajePrice() {
-        composeTestRule.setContent {
-            TravelHubAppMobileTheme { HomeScreen() }
-        }
-        composeTestRule.mainClock.advanceTimeBy(2000)
-        composeTestRule.onNodeWithText("COP 600,000")
-            .performScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithText("Destino").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Check-in").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Check-out").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Huéspedes").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Buscar hoteles").assertIsDisplayed()
     }
 }

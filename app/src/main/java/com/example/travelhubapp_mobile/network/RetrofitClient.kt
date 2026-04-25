@@ -12,7 +12,7 @@ import java.security.cert.X509Certificate
 
 object RetrofitClient {
 
-    private const val BASE_URL = "https://k8s-workload-travelhu-6ebf4c6317-8eaeeae129c46548.elb.us-east-1.amazonaws.com/"
+    private const val BASE_URL = "https://k8s-workload-travelhu-f26ddf980b-5888409b6dd7c4c7.elb.us-east-1.amazonaws.com"
 
     private val hostInterceptor = Interceptor { chain ->
         val request = chain.request().newBuilder()

@@ -130,6 +130,7 @@ dependencies {
     implementation(libs.okhttp.logging)
     implementation(libs.gson)
     implementation(libs.androidx.datastore)
+    implementation(libs.androidx.media3.common.ktx)
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
     testImplementation("androidx.test:core:1.6.1")

@@ -22,4 +22,7 @@ interface ApiService {
 
     @GET("login-handler/health")
     suspend fun healthAuth(): Response<Any>
+
+    @POST("hotels/api/v1/hotels/search")
+    suspend fun searchHotels(@Body request: HotelSearchRequest): Response<List<HotelResponse>>
 }

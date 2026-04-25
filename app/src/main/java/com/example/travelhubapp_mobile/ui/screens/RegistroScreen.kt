@@ -48,6 +48,7 @@ import com.example.travelhubapp_mobile.data.AuthResult
 import com.example.travelhubapp_mobile.data.TokenManager
 import com.example.travelhubapp_mobile.ui.components.BluGradient
 import com.example.travelhubapp_mobile.ui.components.THBackButton
+import java.util.Calendar
 import com.example.travelhubapp_mobile.ui.components.THDatePicker
 import com.example.travelhubapp_mobile.ui.components.THDropdown
 import com.example.travelhubapp_mobile.ui.components.THInput
@@ -292,8 +293,12 @@ private fun LocationFields(
         "País *", "Colombia", Icons.Default.Public)
     THInput(city, { onClear(); onCity(it) },
         "Ciudad *", "Bogotá", Icons.Default.LocationCity)
+    
+    val initialBirthDate = remember {
+        Calendar.getInstance().apply { add(Calendar.YEAR, -25) }.timeInMillis
+    }
     THDatePicker(birthDate, { onClear(); onBirthDate(it) },
-        "Fecha de nacimiento *")
+        "Fecha de nacimiento *", initialDate = initialBirthDate)
 }
 
 @Composable
