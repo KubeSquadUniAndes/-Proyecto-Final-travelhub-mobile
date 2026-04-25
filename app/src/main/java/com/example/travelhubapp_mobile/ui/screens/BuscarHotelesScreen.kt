@@ -61,7 +61,10 @@ fun BuscarHotelesScreen(onBack: () -> Unit, onHotelClick: () -> Unit, viewModel:
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(viewModel.roomResults) { room -> 
-                RoomCard(room, onHotelClick) 
+                RoomCard(room, onClick = {
+                    viewModel.selectedRoom = room
+                    onHotelClick()
+                })
             }
             item { Spacer(Modifier.height(80.dp)) }
         }
@@ -102,6 +105,9 @@ fun RoomCard(room: RoomResponse, onClick: () -> Unit) {
                 Column {
                     Text(room.hotelName ?: "Hotel", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
                     Text(room.name, style = MaterialTheme.typography.bodyLarge, color = Gray600)
+                    room.destination?.let {
+                        Text(it, style = MaterialTheme.typography.labelMedium, color = Blue600, fontWeight = FontWeight.Bold)
+                    }
                 }
 
                 // Capacity and Beds

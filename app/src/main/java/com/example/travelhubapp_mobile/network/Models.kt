@@ -86,3 +86,26 @@ data class RoomResponse(
     @SerializedName("created_at") val createdAt: String?,
     @SerializedName("updated_at") val updatedAt: String?
 )
+
+// === Bookings ===
+data class BookingRequest(
+    @SerializedName("hotel_id") val hotelId: String,
+    @SerializedName("room_id") val roomId: String,
+    @SerializedName("start_time") val startTime: String,
+    @SerializedName("end_time") val endTime: String,
+    @SerializedName("room_type") val roomType: String,
+    @SerializedName("num_guests") val numGuests: Int,
+    @SerializedName("price_per_night") val pricePerNight: Double,
+    @SerializedName("traveler_name") val travelerName: String,
+    @SerializedName("traveler_email") val travelerEmail: String,
+    @SerializedName("traveler_phone") val travelerPhone: String,
+    @SerializedName("traveler_document") val travelerDocument: String,
+    val notes: String = "Test booking",
+    @SerializedName("special_requests") val specialRequests: String = "Late check-in"
+)
+
+data class BookingResponse(
+    val id: String?,
+    val status: String?,
+    val message: String?
+)

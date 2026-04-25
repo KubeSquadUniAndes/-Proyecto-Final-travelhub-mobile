@@ -6,10 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.travelhubapp_mobile.data.TokenManager
-import com.example.travelhubapp_mobile.network.HotelResponse
-import com.example.travelhubapp_mobile.network.HotelSearchRequest
-import com.example.travelhubapp_mobile.network.RetrofitClient
-import com.example.travelhubapp_mobile.network.RoomResponse
+import com.example.travelhubapp_mobile.network.*
 import kotlinx.coroutines.launch
 
 class HotelViewModel(private val tokenManager: TokenManager) : ViewModel() {
@@ -23,6 +20,8 @@ class HotelViewModel(private val tokenManager: TokenManager) : ViewModel() {
 
     var roomResults by mutableStateOf<List<RoomResponse>>(emptyList())
         private set
+
+    var selectedRoom by mutableStateOf<RoomResponse?>(null)
 
     var isLoading by mutableStateOf(false)
         private set
@@ -80,6 +79,56 @@ class HotelViewModel(private val tokenManager: TokenManager) : ViewModel() {
                     onSuccess()
                 } else {
                     error = "Error al buscar habitaciones: ${response.message()}"
+                }
+            } catch (e: Exception) {
+                error = "Error de red: ${e.message}"
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+    fun createBooking(
+        travelerName: String,
+        travelerEmail: String,
+        travelerPhone: String,
+        travelerDocument: String,
+        onSuccess: () -> Unit
+    ) {
+        val room = selectedRoom ?: return
+        viewModelScope.launch {
+            isLoading = true
+            error = null
+            try {
+                val token = tokenManager.getToken()
+                if (token == null) {
+                    error = "Sesión no válida"
+                    return@launch
+                }
+
+                val request = BookingRequest(
+                    hotelId = room.hotelId,
+                    roomId = room.id,
+                    startTime = checkIn.ifBlank { "2026-05-01T15:00:00Z" },
+                    endTime = checkOut.ifBlank { "2026-05-05T11:00:00Z" },
+                    roomType = room.roomType ?: "Deluxe",
+                    numGuests = guests.toIntOrNull() ?: 2,
+                    pricePerNight = room.price.toDoubleOrNull() ?: 150.0,
+                    travelerName = travelerName,
+                    travelerEmail = travelerEmail,
+                    travelerPhone = travelerPhone,
+                    travelerDocument = travelerDocument
+                )
+
+                val response = RetrofitClient.api.createBooking(
+                    token = "Bearer $token",
+                    request = request
+                )
+
+                if (response.isSuccessful) {
+                    onSuccess()
+                } else {
+                    error = "Error al crear reserva: ${response.message()}"
                 }
             } catch (e: Exception) {
                 error = "Error de red: ${e.message}"

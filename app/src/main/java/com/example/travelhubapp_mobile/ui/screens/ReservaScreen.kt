@@ -37,6 +37,8 @@ fun ReservaScreen(onBack: () -> Unit, viewModel: HotelViewModel) {
     var nombre by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var telefono by remember { mutableStateOf("") }
+    var documento by remember { mutableStateOf("") }
+    var showSuccess by remember { mutableStateOf(false) }
 
     // Payment fields
     var cardNumber by remember { mutableStateOf("") }
@@ -104,8 +106,16 @@ fun ReservaScreen(onBack: () -> Unit, viewModel: HotelViewModel) {
                         )
                     }
                     THButton(
-                        text = "Confirmar reserva",
-                        onClick = { /* TODO: Implement confirmation */ },
+                        text = if (viewModel.isLoading) "Confirmando..." else "Confirmar reserva",
+                        onClick = {
+                            viewModel.createBooking(
+                                travelerName = nombre,
+                                travelerEmail = email,
+                                travelerPhone = telefono,
+                                travelerDocument = documento,
+                                onSuccess = { showSuccess = true }
+                            )
+                        },
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -113,6 +123,18 @@ fun ReservaScreen(onBack: () -> Unit, viewModel: HotelViewModel) {
         },
         containerColor = Gray50
     ) { innerPadding ->
+        if (showSuccess) {
+            AlertDialog(
+                onDismissRequest = { showSuccess = false; onBack() },
+                title = { Text("Reserva exitosa") },
+                text = { Text("Tu reserva ha sido confirmada correctamente.") },
+                confirmButton = {
+                    Button(onClick = { showSuccess = false; onBack() }) {
+                        Text("Aceptar")
+                    }
+                }
+            )
+        }
         Column(
             modifier = Modifier
                 .padding(innerPadding)
@@ -122,6 +144,7 @@ fun ReservaScreen(onBack: () -> Unit, viewModel: HotelViewModel) {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             ResumenCard(
+                hotelName = viewModel.selectedRoom?.hotelName ?: "Hotel Grand Luxury",
                 checkIn = viewModel.checkIn.substringBefore('T'),
                 checkOut = viewModel.checkOut.substringBefore('T'),
                 guests = viewModel.guests,
@@ -134,7 +157,9 @@ fun ReservaScreen(onBack: () -> Unit, viewModel: HotelViewModel) {
                 email = email,
                 onEmailChange = { email = it },
                 telefono = telefono,
-                onTelefonoChange = { telefono = it }
+                onTelefonoChange = { telefono = it },
+                documento = documento,
+                onDocumentoChange = { documento = it }
             )
             
             DetallesReservaCard(viewModel)
@@ -152,7 +177,7 @@ fun ReservaScreen(onBack: () -> Unit, viewModel: HotelViewModel) {
 }
 
 @Composable
-private fun ResumenCard(checkIn: String, checkOut: String, guests: String, nights: String) {
+private fun ResumenCard(hotelName: String, checkIn: String, checkOut: String, guests: String, nights: String) {
     Card(
         shape = RoundedCornerShape(10.dp),
         colors = CardDefaults.cardColors(containerColor = White),
@@ -177,7 +202,7 @@ private fun ResumenCard(checkIn: String, checkOut: String, guests: String, night
                 }
                 Spacer(Modifier.width(16.dp))
                 Column {
-                    Text("Hotel Grand Luxury", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text(hotelName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.Star, null, tint = StarYellow, modifier = Modifier.size(16.dp))
                         Text(" 4.8", style = MaterialTheme.typography.bodyMedium, color = Gray600)
@@ -208,7 +233,8 @@ private fun ResumenItem(label: String, value: String) {
 private fun DatosPersonalesCard(
     nombre: String, onNombreChange: (String) -> Unit,
     email: String, onEmailChange: (String) -> Unit,
-    telefono: String, onTelefonoChange: (String) -> Unit
+    telefono: String, onTelefonoChange: (String) -> Unit,
+    documento: String, onDocumentoChange: (String) -> Unit
 ) {
     Card(
         shape = RoundedCornerShape(10.dp),
@@ -224,6 +250,7 @@ private fun DatosPersonalesCard(
             THInput(value = nombre, onValueChange = onNombreChange, label = "Nombre completo", placeholder = "Juan Pérez")
             THInput(value = email, onValueChange = onEmailChange, label = "Email", placeholder = "correo@ejemplo.com")
             THInput(value = telefono, onValueChange = onTelefonoChange, label = "Teléfono", placeholder = "+57 300 123 4567")
+            THInput(value = documento, onValueChange = onDocumentoChange, label = "Número de documento", placeholder = "1234567890")
         }
     }
 }

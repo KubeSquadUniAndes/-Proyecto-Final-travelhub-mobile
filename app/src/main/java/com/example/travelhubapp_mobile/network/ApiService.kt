@@ -32,4 +32,10 @@ interface ApiService {
         @Query("destination") destination: String? = null,
         @Query("guests") guests: Int? = null
     ): Response<List<RoomResponse>>
+
+    @POST("reservas/api/v1/bookings/")
+    suspend fun createBooking(
+        @Header("Authorization") token: String,
+        @Body request: BookingRequest
+    ): Response<BookingResponse>
 }
