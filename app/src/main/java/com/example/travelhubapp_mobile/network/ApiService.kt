@@ -1,10 +1,8 @@
 package com.example.travelhubapp_mobile.network
 
+import com.example.travelhubapp_mobile.network.RoomResponse
 import retrofit2.Response
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.Header
-import retrofit2.http.POST
+import retrofit2.http.*
 
 interface ApiService {
 
@@ -25,4 +23,13 @@ interface ApiService {
 
     @POST("hotels/api/v1/hotels/search")
     suspend fun searchHotels(@Body request: HotelSearchRequest): Response<List<HotelResponse>>
+
+    @GET("hospedajes/api/v1/rooms/search")
+    suspend fun searchRooms(
+        @Header("Authorization") token: String,
+        @Query("checkin") checkin: String,
+        @Query("checkout") checkout: String,
+        @Query("destination") destination: String? = null,
+        @Query("guests") guests: Int? = null
+    ): Response<List<RoomResponse>>
 }

@@ -87,6 +87,7 @@ fun THInput(
     placeholder: String = "",
     leadingIcon: ImageVector? = null,
     isPassword: Boolean = false,
+    keyboardType: KeyboardType = KeyboardType.Text,
     modifier: Modifier = Modifier
 ) {
     var visible by remember { mutableStateOf(false) }
@@ -113,9 +114,9 @@ fun THInput(
             } else null,
             visualTransformation = if (isPassword && !visible)
                 PasswordVisualTransformation() else VisualTransformation.None,
-            keyboardOptions = if (isPassword)
-                KeyboardOptions(keyboardType = KeyboardType.Password)
-                else KeyboardOptions.Default,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = if (isPassword) KeyboardType.Password else keyboardType
+            ),
             shape = RoundedCornerShape(10.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 unfocusedBorderColor = Gray300, focusedBorderColor = Blue600

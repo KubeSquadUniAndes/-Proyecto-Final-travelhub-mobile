@@ -68,3 +68,21 @@ data class HotelResponse(
     val location: String?,
     val image: String?
 )
+
+// === Rooms ===
+data class RoomResponse(
+    val id: String,
+    @SerializedName("hotel_id") val hotelId: String,
+    @SerializedName("hotel_name") val hotelName: String?,
+    val destination: String?,
+    val name: String,
+    @SerializedName("room_type") val roomType: String?,
+    val price: String,
+    val capacity: Int,
+    val beds: String?,
+    val size: Double?,
+    val status: String?,
+    val amenities: String?,
+    @SerializedName("created_at") val createdAt: String?,
+    @SerializedName("updated_at") val updatedAt: String?
+)

@@ -1,17 +1,28 @@
 package com.example.travelhubapp_mobile.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.travelhubapp_mobile.data.TokenManager
 import com.example.travelhubapp_mobile.ui.viewmodels.HotelViewModel
 import com.example.travelhubapp_mobile.ui.screens.*
 
 @Composable
 fun AuthNavGraph() {
+    val context = LocalContext.current
     val navController = rememberNavController()
-    val hotelViewModel: HotelViewModel = viewModel()
+    val hotelViewModel: HotelViewModel = viewModel(
+        factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return HotelViewModel(TokenManager(context)) as T
+            }
+        }
+    )
     val logout: () -> Unit = {
         navController.navigate(Routes.BIENVENIDA) { popUpTo(0) { inclusive = true } }
     }

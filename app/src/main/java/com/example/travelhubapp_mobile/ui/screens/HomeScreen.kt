@@ -10,6 +10,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.travelhubapp_mobile.ui.components.*
 import com.example.travelhubapp_mobile.ui.theme.*
@@ -96,17 +97,21 @@ fun HomeScreen(
                     onValueChange = { newValue ->
                         if (newValue.isEmpty()) {
                             viewModel.guests = ""
-                        } else if (newValue.all { it.isDigit() } && newValue.toIntOrNull()?.let { it <= 20 } == true) {
+                        } else if (newValue.all { it.isDigit() } && (newValue.toIntOrNull() ?: 0) <= 20) {
                             viewModel.guests = newValue
                         }
                     },
-                    "Huéspedes", "Máximo 20", Icons.Default.People)
+                    "Huéspedes",
+                    "Máximo 20",
+                    Icons.Default.People,
+                    keyboardType = KeyboardType.Number
+                )
 
                 if (viewModel.isLoading) {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                 } else {
                     THButton("Buscar hoteles", onClick = {
-                        viewModel.searchHotels(onSuccess = onReservar)
+                        viewModel.searchRooms(onSuccess = onReservar)
                     })
                 }
 
