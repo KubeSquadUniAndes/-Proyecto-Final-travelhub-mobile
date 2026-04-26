@@ -43,4 +43,10 @@ interface ApiService {
     suspend fun getBookings(
         @Header("Authorization") token: String
     ): Response<List<BookingResponse>>
+
+    @GET("reservas/api/v1/bookings/{id}")
+    suspend fun getBookingDetails(
+        @Path("id") id: String,
+        @Header("Authorization") token: String
+    ): Response<BookingResponse>
 }

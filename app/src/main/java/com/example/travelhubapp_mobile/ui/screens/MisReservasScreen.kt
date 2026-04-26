@@ -16,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -31,6 +30,7 @@ fun MisReservasScreen(
     onHome: () -> Unit,
     onPerfil: () -> Unit,
     onBuscarMas: () -> Unit,
+    onBookingClick: (String) -> Unit,
     onLogout: () -> Unit,
     viewModel: HotelViewModel
 ) {
@@ -102,7 +102,7 @@ fun MisReservasScreen(
                     modifier = Modifier.weight(1f)
                 ) {
                     items(viewModel.myBookings) { booking ->
-                        ReservaCard(booking)
+                        ReservaCard(booking, onClick = { booking.id?.let { onBookingClick(it) } })
                     }
                 }
             }
@@ -131,12 +131,13 @@ fun MisReservasScreen(
 }
 
 @Composable
-fun ReservaCard(booking: BookingResponse) {
+fun ReservaCard(booking: BookingResponse, onClick: () -> Unit) {
     Card(
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = White),
         elevation = CardDefaults.cardElevation(2.dp),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        onClick = onClick
     ) {
         Row(
             modifier = Modifier

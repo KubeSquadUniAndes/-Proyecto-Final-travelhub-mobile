@@ -26,6 +26,8 @@ class HotelViewModel(private val tokenManager: TokenManager) : ViewModel() {
     var myBookings by mutableStateOf<List<BookingResponse>>(emptyList())
         private set
 
+    var selectedBookingDetails by mutableStateOf<BookingResponse?>(null)
+
     var isLoading by mutableStateOf(false)
         private set
 
@@ -158,6 +160,31 @@ class HotelViewModel(private val tokenManager: TokenManager) : ViewModel() {
                     myBookings = response.body() ?: emptyList()
                 } else {
                     error = "Error al obtener reservas: ${response.message()}"
+                }
+            } catch (e: Exception) {
+                error = "Error de red: ${e.message}"
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+    fun fetchBookingDetails(bookingId: String) {
+        viewModelScope.launch {
+            isLoading = true
+            error = null
+            try {
+                val token = tokenManager.getToken()
+                if (token == null) {
+                    error = "Sesión no válida"
+                    return@launch
+                }
+
+                val response = RetrofitClient.api.getBookingDetails(bookingId, "Bearer $token")
+                if (response.isSuccessful) {
+                    selectedBookingDetails = response.body()
+                } else {
+                    error = "Error al obtener detalles: ${response.message()}"
                 }
             } catch (e: Exception) {
                 error = "Error de red: ${e.message}"

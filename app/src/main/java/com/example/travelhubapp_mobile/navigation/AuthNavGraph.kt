@@ -8,6 +8,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import com.example.travelhubapp_mobile.data.TokenManager
 import com.example.travelhubapp_mobile.ui.viewmodels.HotelViewModel
 import com.example.travelhubapp_mobile.ui.screens.*
@@ -62,7 +64,20 @@ fun AuthNavGraph() {
                 onHome = { navController.navigate(Routes.HOME) },
                 onPerfil = { navController.navigate(Routes.PERFIL) },
                 onBuscarMas = { navController.navigate(Routes.HOME) },
+                onBookingClick = { id -> navController.navigate("${Routes.RESERVA_PRINT}/$id") },
                 onLogout = logout,
+                viewModel = hotelViewModel
+            )
+        }
+        composable(
+            route = "${Routes.RESERVA_PRINT}/{bookingId}",
+            arguments = listOf(navArgument("bookingId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val bookingId = backStackEntry.arguments?.getString("bookingId") ?: ""
+            ReservaPrintScreen(
+                bookingId = bookingId,
+                onBack = { navController.popBackStack() },
+                onHome = { navController.navigate(Routes.HOME) { popUpTo(Routes.HOME) { inclusive = true } } },
                 viewModel = hotelViewModel
             )
         }
