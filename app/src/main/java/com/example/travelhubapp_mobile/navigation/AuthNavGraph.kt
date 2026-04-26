@@ -20,10 +20,11 @@ fun AuthNavGraph() {
     val navController = rememberNavController()
     val hotelViewModel: HotelViewModel = viewModel(
         factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return HotelViewModel(TokenManager(context)) as T
             }
-        }
+        },
     )
     val logout: () -> Unit = {
         navController.navigate(Routes.BIENVENIDA) { popUpTo(0) { inclusive = true } }
