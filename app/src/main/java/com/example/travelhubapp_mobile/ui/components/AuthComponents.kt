@@ -18,6 +18,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
@@ -306,6 +308,17 @@ fun THBottomBar(selected: Int, onSelect: (Int) -> Unit, onLogout: () -> Unit) {
         NavigationBarItem(
             selected = selected == 1,
             onClick = { onSelect(1) },
+            icon = { Icon(Icons.Default.Favorite, "Mis reservas", modifier = Modifier.size(23.dp)) },
+            label = { Text("Reservas", style = MaterialTheme.typography.labelSmall) },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = Blue600, selectedTextColor = Blue600,
+                unselectedIconColor = Gray600, unselectedTextColor = Gray600,
+                indicatorColor = Color.Transparent
+            )
+        )
+        NavigationBarItem(
+            selected = selected == 2,
+            onClick = { onSelect(2) },
             icon = { Icon(Icons.Default.Person, "Perfil", modifier = Modifier.size(23.dp)) },
             label = { Text("Perfil", style = MaterialTheme.typography.labelSmall) },
             colors = NavigationBarItemDefaults.colors(

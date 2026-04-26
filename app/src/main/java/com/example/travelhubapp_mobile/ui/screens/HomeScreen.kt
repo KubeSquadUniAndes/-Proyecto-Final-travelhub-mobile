@@ -22,6 +22,7 @@ import java.util.Locale
 fun HomeScreen(
     onReservar: () -> Unit,
     onPerfil: () -> Unit,
+    onMisReservas: () -> Unit,
     onLogout: () -> Unit,
     viewModel: HotelViewModel
 ) {
@@ -29,7 +30,12 @@ fun HomeScreen(
         bottomBar = {
             THBottomBar(
                 selected = 0,
-                onSelect = { if (it == 1) onPerfil() },
+                onSelect = { 
+                    when(it) {
+                        1 -> onMisReservas()
+                        2 -> onPerfil()
+                    }
+                },
                 onLogout = onLogout
             )
         }

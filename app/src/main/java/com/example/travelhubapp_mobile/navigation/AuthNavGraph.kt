@@ -52,13 +52,24 @@ fun AuthNavGraph() {
             HomeScreen(
                 onReservar = { navController.navigate(Routes.BUSCAR_HOTELES) },
                 onPerfil = { navController.navigate(Routes.PERFIL) },
+                onMisReservas = { navController.navigate(Routes.MIS_RESERVAS) },
+                onLogout = logout,
+                viewModel = hotelViewModel
+            )
+        }
+        composable(Routes.MIS_RESERVAS) {
+            MisReservasScreen(
+                onHome = { navController.navigate(Routes.HOME) },
+                onPerfil = { navController.navigate(Routes.PERFIL) },
+                onBuscarMas = { navController.navigate(Routes.HOME) },
                 onLogout = logout,
                 viewModel = hotelViewModel
             )
         }
         composable(Routes.PERFIL) {
             PerfilScreen(
-                onHome = { navController.popBackStack() },
+                onHome = { navController.navigate(Routes.HOME) },
+                onMisReservas = { navController.navigate(Routes.MIS_RESERVAS) },
                 onLogout = logout
             )
         }

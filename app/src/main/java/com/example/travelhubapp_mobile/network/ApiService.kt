@@ -38,4 +38,9 @@ interface ApiService {
         @Header("Authorization") token: String,
         @Body request: BookingRequest
     ): Response<BookingResponse>
+
+    @GET("reservas/api/v1/bookings/")
+    suspend fun getBookings(
+        @Header("Authorization") token: String
+    ): Response<List<BookingResponse>>
 }

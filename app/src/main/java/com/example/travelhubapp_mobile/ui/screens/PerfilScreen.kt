@@ -54,12 +54,17 @@ import com.example.travelhubapp_mobile.ui.theme.SuccessLight
 import com.example.travelhubapp_mobile.ui.theme.White
 
 @Composable
-fun PerfilScreen(onLogout: () -> Unit, onHome: () -> Unit = {}) {
+fun PerfilScreen(onLogout: () -> Unit, onHome: () -> Unit, onMisReservas: () -> Unit) {
     Scaffold(
         bottomBar = {
             THBottomBar(
-                selected = 1,
-                onSelect = { if (it == 0) onHome() },
+                selected = 2,
+                onSelect = { 
+                    when(it) {
+                        0 -> onHome()
+                        1 -> onMisReservas()
+                    }
+                },
                 onLogout = onLogout
             )
         }

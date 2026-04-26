@@ -23,6 +23,8 @@ class HotelViewModel(private val tokenManager: TokenManager) : ViewModel() {
 
     var selectedRoom by mutableStateOf<RoomResponse?>(null)
     var lastBooking by mutableStateOf<BookingResponse?>(null)
+    var myBookings by mutableStateOf<List<BookingResponse>>(emptyList())
+        private set
 
     var isLoading by mutableStateOf(false)
         private set
@@ -131,6 +133,31 @@ class HotelViewModel(private val tokenManager: TokenManager) : ViewModel() {
                     onSuccess()
                 } else {
                     error = "Error al crear reserva: ${response.message()}"
+                }
+            } catch (e: Exception) {
+                error = "Error de red: ${e.message}"
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+    fun fetchBookings() {
+        viewModelScope.launch {
+            isLoading = true
+            error = null
+            try {
+                val token = tokenManager.getToken()
+                if (token == null) {
+                    error = "Sesión no válida"
+                    return@launch
+                }
+
+                val response = RetrofitClient.api.getBookings("Bearer $token")
+                if (response.isSuccessful) {
+                    myBookings = response.body() ?: emptyList()
+                } else {
+                    error = "Error al obtener reservas: ${response.message()}"
                 }
             } catch (e: Exception) {
                 error = "Error de red: ${e.message}"

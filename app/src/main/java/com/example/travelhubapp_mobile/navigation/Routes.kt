@@ -9,4 +9,5 @@ object Routes {
     const val RESERVA = "reserva"
     const val BUSCAR_HOTELES = "buscar_hoteles"
     const val CONFIRMACION = "confirmacion"
+    const val MIS_RESERVAS = "mis_reservas"
 }
