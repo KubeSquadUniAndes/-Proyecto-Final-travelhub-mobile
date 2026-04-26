@@ -5,16 +5,24 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.People
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.example.travelhubapp_mobile.ui.components.*
-import com.example.travelhubapp_mobile.ui.theme.*
+import com.example.travelhubapp_mobile.ui.components.THBottomBar
+import com.example.travelhubapp_mobile.ui.components.THButton
+import com.example.travelhubapp_mobile.ui.components.THDatePicker
+import com.example.travelhubapp_mobile.ui.components.THInput
+import com.example.travelhubapp_mobile.ui.theme.Blue600
+import com.example.travelhubapp_mobile.ui.theme.Gray600
+import com.example.travelhubapp_mobile.ui.theme.Gray900
+import com.example.travelhubapp_mobile.ui.theme.White
 import com.example.travelhubapp_mobile.ui.viewmodels.HotelViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -31,7 +39,7 @@ fun HomeScreen(
         bottomBar = {
             THBottomBar(
                 selected = 0,
-                onSelect = { 
+                onSelect = {
                     when(it) {
                         1 -> onMisReservas()
                         2 -> onPerfil()
@@ -76,7 +84,7 @@ fun HomeScreen(
                     viewModel.destino, { viewModel.destino = it }, "Destino", "¿A dónde viajas?", Icons.Default.LocationOn,
                     testTag = "input_destino"
                 )
-                
+
                 val dateFormatter = remember { SimpleDateFormat("yyyy-MM-dd", Locale.ROOT) }
                 val checkInTime = remember(viewModel.checkIn) {
                     try { dateFormatter.parse(viewModel.checkIn.substringBefore('T'))?.time } catch (_: Exception) { null }

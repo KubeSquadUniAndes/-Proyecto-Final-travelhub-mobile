@@ -6,7 +6,6 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.core.app.ApplicationProvider
 import com.example.travelhubapp_mobile.data.TokenManager
 import com.example.travelhubapp_mobile.network.BookingResponse
-import com.example.travelhubapp_mobile.ui.theme.TravelHubAppMobileTheme
 import com.example.travelhubapp_mobile.ui.viewmodels.HotelViewModel
 import org.junit.Before
 import org.junit.Rule
@@ -30,7 +29,7 @@ class ReservaPrintScreenRoboTest {
         val tokenManager = TokenManager(context)
         viewModel = HotelViewModel(tokenManager)
         viewModel.skipNetworkForTests = true
-        
+
         viewModel.selectedBookingDetails = BookingResponse(
             id = "b1",
             bookingCode = "TH-PRINT-TEST",

@@ -8,7 +8,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Bed
+import androidx.compose.material.icons.filled.Hotel
+import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,8 +22,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.travelhubapp_mobile.network.RoomResponse
-import com.example.travelhubapp_mobile.ui.components.*
-import com.example.travelhubapp_mobile.ui.theme.*
+import com.example.travelhubapp_mobile.ui.components.CardShape
+import com.example.travelhubapp_mobile.ui.theme.Blue100
+import com.example.travelhubapp_mobile.ui.theme.Blue600
+import com.example.travelhubapp_mobile.ui.theme.Gray200
+import com.example.travelhubapp_mobile.ui.theme.Gray50
+import com.example.travelhubapp_mobile.ui.theme.Gray600
+import com.example.travelhubapp_mobile.ui.theme.Gray700
+import com.example.travelhubapp_mobile.ui.theme.White
 import com.example.travelhubapp_mobile.ui.viewmodels.HotelViewModel
 
 @Composable
@@ -39,7 +48,11 @@ fun BuscarHotelesScreen(onBack: () -> Unit, onHotelClick: () -> Unit, viewModel:
                 Column {
                     val location = viewModel.roomResults.firstOrNull()?.destination ?: viewModel.destino
                     Text("Resultados", style = MaterialTheme.typography.headlineSmall)
-                    Text("$location • ${viewModel.checkIn.substringBefore('T')}", style = MaterialTheme.typography.bodyMedium, color = Gray600)
+                    Text(
+                        "$location • ${viewModel.checkIn.substringBefore('T')}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Gray600
+                    )
                 }
             }
             IconButton(onClick = {}, modifier = Modifier.size(43.dp).clip(CircleShape)) {
@@ -61,7 +74,7 @@ fun BuscarHotelesScreen(onBack: () -> Unit, onHotelClick: () -> Unit, viewModel:
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            items(viewModel.roomResults) { room -> 
+            items(viewModel.roomResults) { room ->
                 RoomCard(room, onClick = {
                     viewModel.selectedRoom = room
                     onHotelClick()
@@ -157,7 +170,12 @@ fun RoomCard(room: RoomResponse, onClick: () -> Unit) {
                 ) {
                     Column {
                         Text("Desde", style = MaterialTheme.typography.labelSmall, color = Gray600)
-                        Text("$${room.price}", style = MaterialTheme.typography.headlineMedium, color = Blue600, fontWeight = FontWeight.Bold)
+                        Text(
+                            "$${room.price}",
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = Blue600,
+                            fontWeight = FontWeight.Bold
+                        )
                         Text("por noche", style = MaterialTheme.typography.labelSmall, color = Gray600)
                     }
                     Button(

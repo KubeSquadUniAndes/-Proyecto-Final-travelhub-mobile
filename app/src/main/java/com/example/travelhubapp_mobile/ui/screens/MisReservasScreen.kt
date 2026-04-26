@@ -16,14 +16,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.travelhubapp_mobile.network.BookingResponse
 import com.example.travelhubapp_mobile.ui.components.THBottomBar
-import com.example.travelhubapp_mobile.ui.theme.*
+import com.example.travelhubapp_mobile.ui.theme.Blue600
+import com.example.travelhubapp_mobile.ui.theme.Gray100
+import com.example.travelhubapp_mobile.ui.theme.Gray200
+import com.example.travelhubapp_mobile.ui.theme.Gray400
+import com.example.travelhubapp_mobile.ui.theme.Gray600
+import com.example.travelhubapp_mobile.ui.theme.StarYellow
+import com.example.travelhubapp_mobile.ui.theme.White
 import com.example.travelhubapp_mobile.ui.viewmodels.HotelViewModel
 
 @Composable
@@ -43,7 +48,7 @@ fun MisReservasScreen(
         bottomBar = {
             THBottomBar(
                 selected = 1,
-                onSelect = { 
+                onSelect = {
                     when(it) {
                         0 -> onHome()
                         2 -> onPerfil()
@@ -61,7 +66,7 @@ fun MisReservasScreen(
                 .padding(horizontal = 16.dp)
         ) {
             Spacer(modifier = Modifier.height(24.dp))
-            
+
             // Header
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
@@ -109,7 +114,7 @@ fun MisReservasScreen(
             }
 
             Spacer(modifier = Modifier.height(16.dp))
-            
+
             OutlinedButton(
                 onClick = onBuscarMas,
                 modifier = Modifier
@@ -126,7 +131,7 @@ fun MisReservasScreen(
                     fontWeight = FontWeight.Bold
                 )
             }
-            
+
             Spacer(modifier = Modifier.height(24.dp))
         }
     }

@@ -6,8 +6,15 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.travelhubapp_mobile.data.TokenManager
-import com.example.travelhubapp_mobile.network.*
+import com.example.travelhubapp_mobile.network.BookingRequest
+import com.example.travelhubapp_mobile.network.BookingResponse
+import com.example.travelhubapp_mobile.network.HotelResponse
+import com.example.travelhubapp_mobile.network.HotelSearchRequest
+import com.example.travelhubapp_mobile.network.RetrofitClient
+import com.example.travelhubapp_mobile.network.RoomResponse
+import java.io.IOException
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 
 class HotelViewModel(private val tokenManager: TokenManager) : ViewModel() {
     var destino by mutableStateOf("")
@@ -46,8 +53,10 @@ class HotelViewModel(private val tokenManager: TokenManager) : ViewModel() {
                 } else {
                     error = "Error al buscar hoteles: ${response.message()}"
                 }
-            } catch (e: Exception) {
+            } catch (e: IOException) {
                 error = "Error de red: ${e.localizedMessage}"
+            } catch (e: HttpException) {
+                error = "Error HTTP: ${e.message()}"
             } finally {
                 isLoading = false
             }
@@ -80,8 +89,10 @@ class HotelViewModel(private val tokenManager: TokenManager) : ViewModel() {
                 } else {
                     error = "Error al buscar habitaciones: ${response.message()}"
                 }
-            } catch (e: Exception) {
+            } catch (e: IOException) {
                 error = "Error de red: ${e.message}"
+            } catch (e: HttpException) {
+                error = "Error HTTP: ${e.message}"
             } finally {
                 isLoading = false
             }
@@ -129,7 +140,7 @@ class HotelViewModel(private val tokenManager: TokenManager) : ViewModel() {
                 if (response.isSuccessful) {
                     val createdBooking = response.body()
                     lastBooking = createdBooking
-                    
+
                     // Approve the booking
                     createdBooking?.id?.let { bookingId ->
                         val approveResponse = RetrofitClient.api.approveBooking(
@@ -145,8 +156,10 @@ class HotelViewModel(private val tokenManager: TokenManager) : ViewModel() {
                 } else {
                     error = "Error al crear reserva: ${response.message()}"
                 }
-            } catch (e: Exception) {
+            } catch (e: IOException) {
                 error = "Error de red: ${e.message}"
+            } catch (e: HttpException) {
+                error = "Error HTTP: ${e.message}"
             } finally {
                 isLoading = false
             }
@@ -171,8 +184,10 @@ class HotelViewModel(private val tokenManager: TokenManager) : ViewModel() {
                 } else {
                     error = "Error al obtener reservas: ${response.message()}"
                 }
-            } catch (e: Exception) {
+            } catch (e: IOException) {
                 error = "Error de red: ${e.message}"
+            } catch (e: HttpException) {
+                error = "Error HTTP: ${e.message}"
             } finally {
                 isLoading = false
             }
@@ -197,8 +212,10 @@ class HotelViewModel(private val tokenManager: TokenManager) : ViewModel() {
                 } else {
                     error = "Error al obtener detalles: ${response.message()}"
                 }
-            } catch (e: Exception) {
+            } catch (e: IOException) {
                 error = "Error de red: ${e.message}"
+            } catch (e: HttpException) {
+                error = "Error HTTP: ${e.message}"
             } finally {
                 isLoading = false
             }

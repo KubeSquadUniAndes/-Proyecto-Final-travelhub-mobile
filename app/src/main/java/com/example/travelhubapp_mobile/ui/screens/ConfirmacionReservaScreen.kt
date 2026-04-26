@@ -16,9 +16,14 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.travelhubapp_mobile.ui.components.THButton
-import com.example.travelhubapp_mobile.ui.theme.*
+import com.example.travelhubapp_mobile.ui.theme.Blue100
+import com.example.travelhubapp_mobile.ui.theme.Blue600
+import com.example.travelhubapp_mobile.ui.theme.Blue900
+import com.example.travelhubapp_mobile.ui.theme.Gray100
+import com.example.travelhubapp_mobile.ui.theme.Gray600
+import com.example.travelhubapp_mobile.ui.theme.Gray900
+import com.example.travelhubapp_mobile.ui.theme.White
 import com.example.travelhubapp_mobile.ui.viewmodels.HotelViewModel
 
 @Composable

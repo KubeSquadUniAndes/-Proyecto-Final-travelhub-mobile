@@ -4,28 +4,39 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Hotel
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.QrCode2
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.travelhubapp_mobile.network.BookingResponse
-import com.example.travelhubapp_mobile.ui.components.THButton
-import com.example.travelhubapp_mobile.ui.theme.*
+import com.example.travelhubapp_mobile.ui.theme.Blue600
+import com.example.travelhubapp_mobile.ui.theme.Gray100
+import com.example.travelhubapp_mobile.ui.theme.Gray200
+import com.example.travelhubapp_mobile.ui.theme.Gray400
+import com.example.travelhubapp_mobile.ui.theme.Gray50
+import com.example.travelhubapp_mobile.ui.theme.Gray600
+import com.example.travelhubapp_mobile.ui.theme.Gray700
+import com.example.travelhubapp_mobile.ui.theme.StarYellow
+import com.example.travelhubapp_mobile.ui.theme.White
 import com.example.travelhubapp_mobile.ui.viewmodels.HotelViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -142,7 +153,12 @@ fun ReservaPrintScreen(
                     IconDetailItem(Icons.Default.CalendarMonth, "Check-in", "A partir de las 15:00")
                     IconDetailItem(Icons.Default.CalendarMonth, "Check-out", "Hasta las 12:00")
                     IconDetailItem(Icons.Default.People, "Número de huéspedes", "${booking.numGuests} personas")
-                    IconDetailItem(Icons.Default.Schedule, "Duración", "${booking.totalNights} ${if (booking.totalNights == 1) "noche" else "noches"}")
+                    val nightsLabel = if (booking.totalNights == 1) "noche" else "noches"
+                    IconDetailItem(
+                        Icons.Default.Schedule,
+                        "Duración",
+                        "${booking.totalNights} $nightsLabel"
+                    )
                 }
 
                 // Guest Info
@@ -224,7 +240,7 @@ fun ReservaPrintScreen(
                 ) {
                     Text("Volver al inicio", fontWeight = FontWeight.Bold)
                 }
-                
+
                 Spacer(Modifier.height(24.dp))
             }
         }

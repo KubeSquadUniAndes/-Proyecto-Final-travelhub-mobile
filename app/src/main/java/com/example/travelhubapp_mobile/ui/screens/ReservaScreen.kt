@@ -7,28 +7,36 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Hotel
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.travelhubapp_mobile.ui.components.THButton
 import com.example.travelhubapp_mobile.ui.components.THDatePicker
 import com.example.travelhubapp_mobile.ui.components.THInput
-import com.example.travelhubapp_mobile.ui.theme.*
+import com.example.travelhubapp_mobile.ui.theme.Blue100
+import com.example.travelhubapp_mobile.ui.theme.Blue600
+import com.example.travelhubapp_mobile.ui.theme.Gray200
+import com.example.travelhubapp_mobile.ui.theme.Gray50
+import com.example.travelhubapp_mobile.ui.theme.Gray600
+import com.example.travelhubapp_mobile.ui.theme.Gray900
+import com.example.travelhubapp_mobile.ui.theme.StarYellow
+import com.example.travelhubapp_mobile.ui.theme.White
 import com.example.travelhubapp_mobile.ui.viewmodels.HotelViewModel
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
-import java.util.Calendar
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
@@ -47,7 +55,7 @@ fun ReservaScreen(onBack: () -> Unit, onSuccess: () -> Unit, viewModel: HotelVie
     var cvv by remember { mutableStateOf("") }
 
     val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd", Locale.ROOT) }
-    
+
     val nights = remember(viewModel.checkIn, viewModel.checkOut) {
         try {
             val start = dateFormat.parse(viewModel.checkIn.substringBefore('T'))
@@ -61,9 +69,11 @@ fun ReservaScreen(onBack: () -> Unit, onSuccess: () -> Unit, viewModel: HotelVie
 
     val pricePerNight = 600000.0 // Hardcoded for example as per image (1,800,000 / 3)
     val totalAmount = nights * pricePerNight
-    val currencyFormatter = remember { NumberFormat.getCurrencyInstance(Locale("es", "CO")).apply { 
-        maximumFractionDigits = 0 
-    } }
+    val currencyFormatter = remember {
+        NumberFormat.getCurrencyInstance(Locale("es", "CO")).apply {
+            maximumFractionDigits = 0
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -139,7 +149,7 @@ fun ReservaScreen(onBack: () -> Unit, onSuccess: () -> Unit, viewModel: HotelVie
                 guests = viewModel.guests,
                 nights = nights.toString()
             )
-            
+
             DatosPersonalesCard(
                 nombre = nombre,
                 onNombreChange = { nombre = it },
@@ -150,7 +160,7 @@ fun ReservaScreen(onBack: () -> Unit, onSuccess: () -> Unit, viewModel: HotelVie
                 documento = documento,
                 onDocumentoChange = { documento = it }
             )
-            
+
             DetallesReservaCard(viewModel)
 
             MetodoPagoCard(
@@ -159,7 +169,7 @@ fun ReservaScreen(onBack: () -> Unit, onSuccess: () -> Unit, viewModel: HotelVie
                 expiry, { expiry = it },
                 cvv, { cvv = it }
             )
-            
+
             Spacer(Modifier.height(16.dp))
         }
     }
@@ -236,10 +246,34 @@ private fun DatosPersonalesCard(
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
-            THInput(value = nombre, onValueChange = onNombreChange, label = "Nombre completo", placeholder = "Juan Pérez", testTag = "input_nombre")
-            THInput(value = email, onValueChange = onEmailChange, label = "Email", placeholder = "correo@ejemplo.com", testTag = "input_email")
-            THInput(value = telefono, onValueChange = onTelefonoChange, label = "Teléfono", placeholder = "+57 300 123 4567", testTag = "input_telefono")
-            THInput(value = documento, onValueChange = onDocumentoChange, label = "Número de documento", placeholder = "1234567890", testTag = "input_documento")
+            THInput(
+                value = nombre,
+                onValueChange = onNombreChange,
+                label = "Nombre completo",
+                placeholder = "Juan Pérez",
+                testTag = "input_nombre"
+            )
+            THInput(
+                value = email,
+                onValueChange = onEmailChange,
+                label = "Email",
+                placeholder = "correo@ejemplo.com",
+                testTag = "input_email"
+            )
+            THInput(
+                value = telefono,
+                onValueChange = onTelefonoChange,
+                label = "Teléfono",
+                placeholder = "+57 300 123 4567",
+                testTag = "input_telefono"
+            )
+            THInput(
+                value = documento,
+                onValueChange = onDocumentoChange,
+                label = "Número de documento",
+                placeholder = "1234567890",
+                testTag = "input_documento"
+            )
         }
     }
 }
@@ -257,7 +291,7 @@ private fun DetallesReservaCard(viewModel: HotelViewModel) {
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
-            
+
             val dateFormatter = remember { SimpleDateFormat("yyyy-MM-dd", Locale.ROOT) }
             val checkInTime = try { dateFormatter.parse(viewModel.checkIn.substringBefore('T'))?.time } catch (_: Exception) { null }
             val checkOutTime = try { dateFormatter.parse(viewModel.checkOut.substringBefore('T'))?.time } catch (_: Exception) { null }
@@ -315,10 +349,10 @@ private fun MetodoPagoCard(
                     fontWeight = FontWeight.Bold
                 )
             }
-            
+
             THInput(value = number, onValueChange = onNumberChange, label = "Número de tarjeta", placeholder = "1234 5678 9012 3456")
             THInput(value = name, onValueChange = onNameChange, label = "Nombre en la tarjeta", placeholder = "JUAN PEREZ")
-            
+
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 Box(modifier = Modifier.weight(1f)) {
                     THInput(value = expiry, onValueChange = onExpiryChange, label = "Vencimiento", placeholder = "MM/AA")
