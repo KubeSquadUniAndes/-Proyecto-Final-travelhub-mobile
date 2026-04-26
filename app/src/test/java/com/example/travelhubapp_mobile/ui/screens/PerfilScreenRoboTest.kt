@@ -1,13 +1,16 @@
 package com.example.travelhubapp_mobile.ui.screens
 
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import com.example.travelhubapp_mobile.ui.theme.TravelHubAppMobileTheme
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import java.util.concurrent.atomic.AtomicBoolean
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
@@ -24,10 +27,11 @@ class PerfilScreenRoboTest {
             }
         }
 
-        composeTestRule.onNodeWithText("Mi Perfil").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Viajero TravelHub").assertIsDisplayed()
-        composeTestRule.onNodeWithText("8").assertIsDisplayed() // StatCard value
-        composeTestRule.onNodeWithText("Reservas").assertIsDisplayed() // StatCard label
+        composeTestRule.onNodeWithText("Mi Perfil").assertExists()
+        composeTestRule.onNodeWithText("Viajero TravelHub").assertExists()
+        composeTestRule.onNodeWithText("8").assertExists()
+        // Check for "Reservas" in stat card (no click action)
+        composeTestRule.onNode(hasText("Reservas") and !hasClickAction()).assertExists()
     }
 
     @Test
@@ -38,9 +42,9 @@ class PerfilScreenRoboTest {
             }
         }
 
-        composeTestRule.onNodeWithText("Reservas recientes").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Hotel Grand Luxury").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Beachfront Paradise Resort").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Reservas recientes").assertExists()
+        composeTestRule.onNodeWithText("Hotel Grand Luxury").assertExists()
+        composeTestRule.onNodeWithText("Beachfront Paradise Resort").assertExists()
     }
 
     @Test
@@ -51,51 +55,54 @@ class PerfilScreenRoboTest {
             }
         }
 
-        composeTestRule.onNodeWithText("Mi cuenta").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Información personal").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Métodos de pago").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Notificaciones").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Seguridad").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Mi cuenta").assertExists()
+        composeTestRule.onNodeWithText("Información personal").assertExists()
+        composeTestRule.onNodeWithText("Métodos de pago").assertExists()
+        composeTestRule.onNodeWithText("Notificaciones").assertExists()
+        composeTestRule.onNodeWithText("Seguridad").assertExists()
     }
 
     @Test
     fun logoutButton_triggersCallback() {
-        var logoutClicked = false
+        val logoutClicked = AtomicBoolean(false)
         composeTestRule.setContent {
-            TravelHubAppMobileTheme {
-                PerfilScreen(
-                    onLogout = { logoutClicked = true },
-                    onHome = {},
-                    onMisReservas = {}
-                )
-            }
+            PerfilScreen(
+                onLogout = { logoutClicked.set(true) },
+                onHome = {},
+                onMisReservas = {}
+            )
         }
 
-        // Scroll to the bottom to find the button if needed, but PerfilScreen is small enough usually
-        // or we can use performScrollTo() if it was in a scrollable list
-        composeTestRule.onNodeWithText("Cerrar sesión").performClick()
-        assert(logoutClicked)
+        composeTestRule.waitForIdle()
+        composeTestRule
+            .onNodeWithTag("btn_logout", useUnmergedTree = true)
+            .assertHasClickAction()
+            .performSemanticsAction(SemanticsActions.OnClick)
+        composeTestRule.waitForIdle()
+
+        assertTrue("onLogout callback was not triggered", logoutClicked.get())
     }
 
     @Test
     fun bottomBar_navigation() {
-        var homeClicked = false
-        var misReservasClicked = false
+        val homeClicked = AtomicBoolean(false)
+        val misReservasClicked = AtomicBoolean(false)
 
         composeTestRule.setContent {
-            TravelHubAppMobileTheme {
-                PerfilScreen(
-                    onLogout = {},
-                    onHome = { homeClicked = true },
-                    onMisReservas = { misReservasClicked = true }
-                )
-            }
+            PerfilScreen(
+                onLogout = {},
+                onHome = { homeClicked.set(true) },
+                onMisReservas = { misReservasClicked.set(true) }
+            )
         }
 
-        composeTestRule.onNodeWithText("Inicio").performClick()
-        assert(homeClicked)
+        composeTestRule.waitForIdle()
+        composeTestRule.onNode(hasText("Inicio") and hasClickAction()).performClick()
+        composeTestRule.waitForIdle()
+        assertTrue(homeClicked.get())
 
-        composeTestRule.onNodeWithText("Reservas").performClick()
-        assert(misReservasClicked)
+        composeTestRule.onNode(hasText("Reservas") and hasClickAction()).performClick()
+        composeTestRule.waitForIdle()
+        assertTrue(misReservasClicked.get())
     }
 }

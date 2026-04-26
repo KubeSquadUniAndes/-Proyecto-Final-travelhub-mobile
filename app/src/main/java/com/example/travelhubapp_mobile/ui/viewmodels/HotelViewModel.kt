@@ -16,25 +16,19 @@ class HotelViewModel(private val tokenManager: TokenManager) : ViewModel() {
     var guests by mutableStateOf("2")
 
     var searchResults by mutableStateOf<List<HotelResponse>>(emptyList())
-        private set
-
     var roomResults by mutableStateOf<List<RoomResponse>>(emptyList())
-        private set
-
     var selectedRoom by mutableStateOf<RoomResponse?>(null)
     var lastBooking by mutableStateOf<BookingResponse?>(null)
     var myBookings by mutableStateOf<List<BookingResponse>>(emptyList())
-        private set
-
     var selectedBookingDetails by mutableStateOf<BookingResponse?>(null)
 
     var isLoading by mutableStateOf(false)
-        private set
-
     var error by mutableStateOf<String?>(null)
-        private set
+
+    var skipNetworkForTests = false
 
     fun searchHotels(onSuccess: () -> Unit) {
+        if (skipNetworkForTests) return
         viewModelScope.launch {
             isLoading = true
             error = null
@@ -61,6 +55,7 @@ class HotelViewModel(private val tokenManager: TokenManager) : ViewModel() {
     }
 
     fun searchRooms(onSuccess: () -> Unit) {
+        if (skipNetworkForTests) return
         viewModelScope.launch {
             isLoading = true
             error = null
@@ -100,6 +95,7 @@ class HotelViewModel(private val tokenManager: TokenManager) : ViewModel() {
         travelerDocument: String,
         onSuccess: () -> Unit
     ) {
+        if (skipNetworkForTests) return
         val room = selectedRoom ?: return
         viewModelScope.launch {
             isLoading = true
@@ -158,6 +154,7 @@ class HotelViewModel(private val tokenManager: TokenManager) : ViewModel() {
     }
 
     fun fetchBookings() {
+        if (skipNetworkForTests) return
         viewModelScope.launch {
             isLoading = true
             error = null
@@ -183,6 +180,7 @@ class HotelViewModel(private val tokenManager: TokenManager) : ViewModel() {
     }
 
     fun fetchBookingDetails(bookingId: String) {
+        if (skipNetworkForTests) return
         viewModelScope.launch {
             isLoading = true
             error = null

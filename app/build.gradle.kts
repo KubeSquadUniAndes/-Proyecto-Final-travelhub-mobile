@@ -68,6 +68,10 @@ val instrumentClassesOffline by tasks.registering(JacocoOfflineInstrumentTask::c
 
 afterEvaluate {
     tasks.named<Test>("testDebugUnitTest") {
+        // We use offline instrumentation, so the runtime agent must stay disabled.
+        extensions.configure<org.gradle.testing.jacoco.plugins.JacocoTaskExtension> {
+            isEnabled = false
+        }
         dependsOn(instrumentClassesOffline)
         doFirst {
             // Instrumented classes must come first so Robolectric loads them
@@ -141,8 +145,8 @@ dependencies {
     testImplementation(libs.androidx.compose.material.icons.extended)
     testImplementation(libs.androidx.navigation.compose)
     testImplementation(libs.androidx.activity.compose)
-    // JaCoCo offline runtime — needed so instrumented classes can write exec data
-    testImplementation("org.jacoco:org.jacoco.core:0.8.12")
+    // Offline-instrumented classes need this runtime package at test execution time.
+    testRuntimeOnly("org.jacoco:org.jacoco.agent:0.8.12:runtime")
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.androidx.espresso.core)

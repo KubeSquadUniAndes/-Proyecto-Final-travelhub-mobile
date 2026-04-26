@@ -17,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -101,7 +102,8 @@ fun ReservaScreen(onBack: () -> Unit, onSuccess: () -> Unit, viewModel: HotelVie
                             currencyFormatter.format(totalAmount).replace("$", "COP "),
                             style = MaterialTheme.typography.headlineMedium,
                             color = Blue600,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.testTag("total_price")
                         )
                     }
                     THButton(
@@ -234,10 +236,10 @@ private fun DatosPersonalesCard(
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
-            THInput(value = nombre, onValueChange = onNombreChange, label = "Nombre completo", placeholder = "Juan Pérez")
-            THInput(value = email, onValueChange = onEmailChange, label = "Email", placeholder = "correo@ejemplo.com")
-            THInput(value = telefono, onValueChange = onTelefonoChange, label = "Teléfono", placeholder = "+57 300 123 4567")
-            THInput(value = documento, onValueChange = onDocumentoChange, label = "Número de documento", placeholder = "1234567890")
+            THInput(value = nombre, onValueChange = onNombreChange, label = "Nombre completo", placeholder = "Juan Pérez", testTag = "input_nombre")
+            THInput(value = email, onValueChange = onEmailChange, label = "Email", placeholder = "correo@ejemplo.com", testTag = "input_email")
+            THInput(value = telefono, onValueChange = onTelefonoChange, label = "Teléfono", placeholder = "+57 300 123 4567", testTag = "input_telefono")
+            THInput(value = documento, onValueChange = onDocumentoChange, label = "Número de documento", placeholder = "1234567890", testTag = "input_documento")
         }
     }
 }

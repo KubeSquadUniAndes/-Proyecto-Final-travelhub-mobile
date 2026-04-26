@@ -10,6 +10,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.travelhubapp_mobile.ui.components.*
@@ -71,7 +72,10 @@ fun HomeScreen(
                     .padding(20.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                THInput(viewModel.destino, { viewModel.destino = it }, "Destino", "¿A dónde viajas?", Icons.Default.LocationOn)
+                THInput(
+                    viewModel.destino, { viewModel.destino = it }, "Destino", "¿A dónde viajas?", Icons.Default.LocationOn,
+                    testTag = "input_destino"
+                )
                 
                 val dateFormatter = remember { SimpleDateFormat("yyyy-MM-dd", Locale.ROOT) }
                 val checkInTime = remember(viewModel.checkIn) {
@@ -87,7 +91,8 @@ fun HomeScreen(
                     label = "Check-in",
                     placeholder = "Selecciona fecha",
                     minDate = System.currentTimeMillis(),
-                    maxDate = checkOutTime
+                    maxDate = checkOutTime,
+                    testTag = "picker_checkin"
                 )
 
                 THDatePicker(
@@ -95,7 +100,8 @@ fun HomeScreen(
                     onValueChange = { viewModel.checkOut = "${it}T12:00:00" },
                     label = "Check-out",
                     placeholder = "Selecciona fecha",
-                    minDate = checkInTime ?: System.currentTimeMillis()
+                    minDate = checkInTime ?: System.currentTimeMillis(),
+                    testTag = "picker_checkout"
                 )
 
                 THInput(
@@ -110,7 +116,8 @@ fun HomeScreen(
                     "Huéspedes",
                     "Máximo 20",
                     Icons.Default.People,
-                    keyboardType = KeyboardType.Number
+                    keyboardType = KeyboardType.Number,
+                    testTag = "input_guests"
                 )
 
                 if (viewModel.isLoading) {
@@ -118,7 +125,7 @@ fun HomeScreen(
                 } else {
                     THButton("Buscar hoteles", onClick = {
                         viewModel.searchRooms(onSuccess = onReservar)
-                    })
+                    }, modifier = Modifier.testTag("btn_search"))
                 }
 
                 viewModel.error?.let {

@@ -49,6 +49,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -90,7 +91,8 @@ fun THInput(
     leadingIcon: ImageVector? = null,
     isPassword: Boolean = false,
     keyboardType: KeyboardType = KeyboardType.Text,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    testTag: String? = null
 ) {
     var visible by remember { mutableStateOf(false) }
     Column(
@@ -124,7 +126,7 @@ fun THInput(
                 unfocusedBorderColor = Gray300, focusedBorderColor = Blue600
             ),
             singleLine = true,
-            modifier = Modifier.fillMaxWidth().height(50.dp)
+            modifier = Modifier.fillMaxWidth().height(50.dp).then(if (testTag != null) Modifier.testTag(testTag) else Modifier)
         )
     }
 }
@@ -190,7 +192,8 @@ fun THDatePicker(
     minDate: Long? = null,
     maxDate: Long? = null,
     initialDate: Long? = null,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    testTag: String? = null
 ) {
     val context = LocalContext.current
     
@@ -227,7 +230,7 @@ fun THDatePicker(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(label, style = MaterialTheme.typography.titleSmall, color = Gray700)
-        Box {
+        Box(modifier = if (testTag != null) Modifier.testTag(testTag) else Modifier) {
             OutlinedTextField(
                 value = value,
                 onValueChange = {},

@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -113,7 +114,8 @@ fun MisReservasScreen(
                 onClick = onBuscarMas,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp),
+                    .height(50.dp)
+                    .testTag("btn_buscar_mas"),
                 shape = RoundedCornerShape(10.dp),
                 border = BorderStroke(1.dp, Blue600),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = Blue600)
@@ -136,7 +138,7 @@ fun ReservaCard(booking: BookingResponse, onClick: () -> Unit) {
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = White),
         elevation = CardDefaults.cardElevation(2.dp),
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().testTag("reserva_card_${booking.id}"),
         onClick = onClick
     ) {
         Row(
