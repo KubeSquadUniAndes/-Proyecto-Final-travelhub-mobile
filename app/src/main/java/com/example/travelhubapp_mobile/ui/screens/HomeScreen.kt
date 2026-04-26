@@ -1,195 +1,146 @@
 package com.example.travelhubapp_mobile.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Hotel
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.filled.People
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.travelhubapp_mobile.ui.components.THBottomBar
-import com.example.travelhubapp_mobile.ui.theme.Blue100
+import com.example.travelhubapp_mobile.ui.components.THButton
+import com.example.travelhubapp_mobile.ui.components.THDatePicker
+import com.example.travelhubapp_mobile.ui.components.THInput
 import com.example.travelhubapp_mobile.ui.theme.Blue600
-import com.example.travelhubapp_mobile.ui.theme.Gray50
-import com.example.travelhubapp_mobile.ui.theme.Gray500
 import com.example.travelhubapp_mobile.ui.theme.Gray600
 import com.example.travelhubapp_mobile.ui.theme.Gray900
-import com.example.travelhubapp_mobile.ui.theme.StarYellow
 import com.example.travelhubapp_mobile.ui.theme.White
-import kotlinx.coroutines.delay
-
-private data class Hospedaje(
-    val id: Int,
-    val nombre: String,
-    val ubicacion: String,
-    val precioPorNoche: String,
-    val rating: String
-)
-
-private val hospedajes = listOf(
-    Hospedaje(1, "Hotel Grand Luxury", "Bogotá, Colombia", "COP 600,000", "4.8"),
-    Hospedaje(2, "Modern Boutique Hotel", "Medellín, Colombia", "COP 480,000", "4.6"),
-    Hospedaje(3, "Beachfront Paradise Resort", "Cartagena, Colombia", "COP 800,000", "4.9"),
-    Hospedaje(4, "Mountain View Lodge", "Santa Marta, Colombia", "COP 350,000", "4.5"),
-    Hospedaje(5, "Pool View Resort", "San Andrés, Colombia", "COP 720,000", "4.7"),
-)
-
-private const val LOADING_DELAY = 1500L
+import com.example.travelhubapp_mobile.ui.viewmodels.HotelViewModel
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @Composable
-fun HomeScreen(onReservar: () -> Unit = {}, onPerfil: () -> Unit = {}, onLogout: () -> Unit = {}) {
-    var isLoading by remember { mutableStateOf(true) }
-    var lista by remember { mutableStateOf<List<Hospedaje>>(emptyList()) }
-    var selectedTab by remember { mutableIntStateOf(0) }
-
-    LaunchedEffect(Unit) {
-        delay(LOADING_DELAY)
-        lista = hospedajes
-        isLoading = false
-    }
-
+fun HomeScreen(
+    onReservar: () -> Unit,
+    onPerfil: () -> Unit,
+    onMisReservas: () -> Unit,
+    onLogout: () -> Unit,
+    viewModel: HotelViewModel
+) {
     Scaffold(
         bottomBar = {
             THBottomBar(
-                selected = selectedTab,
-                onSelect = { tab -> selectedTab = tab; if (tab == 1) onPerfil() },
+                selected = 0,
+                onSelect = {
+                    when(it) {
+                        1 -> onMisReservas()
+                        2 -> onPerfil()
+                    }
+                },
                 onLogout = onLogout
             )
         }
     ) { innerPadding ->
-        HomeContent(isLoading, lista, onReservar, Modifier.padding(innerPadding))
-    }
-}
-
-@Composable
-private fun HomeContent(
-    isLoading: Boolean,
-    lista: List<Hospedaje>,
-    onReservar: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Column(modifier.fillMaxSize().background(White)) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+                .background(White)
+                .verticalScroll(rememberScrollState())
         ) {
-            Text("TravelHub", style = MaterialTheme.typography.headlineLarge, color = Blue600)
-            Text("Hospedajes disponibles", style = MaterialTheme.typography.titleMedium, color = Gray600)
-        }
-        if (isLoading) {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    CircularProgressIndicator(color = Blue600, strokeWidth = 3.dp)
-                    Text("Cargando hospedajes...", style = MaterialTheme.typography.bodyMedium, color = Gray500)
-                }
-            }
-        } else {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize().background(Gray50),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+            // Header
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                item {
-                    Text(
-                        "${lista.size} hospedajes disponibles",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Gray500
-                    )
-                }
-                items(lista, key = { it.id }) { hospedaje -> HospedajeCard(hospedaje, onReservar) }
-                item { Spacer(Modifier.height(16.dp)) }
+                Text("TravelHub", style = MaterialTheme.typography.headlineLarge, color = Blue600)
             }
-        }
-    }
-}
 
-@Composable
-private fun HospedajeCard(hospedaje: Hospedaje, onReservar: () -> Unit) {
-    Card(
-        shape = RoundedCornerShape(10.dp),
-        colors = CardDefaults.cardColors(containerColor = White),
-        elevation = CardDefaults.cardElevation(1.dp),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column {
-            Box(
-                modifier = Modifier.fillMaxWidth().height(180.dp).background(Blue100),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(Icons.Default.Hotel, null, tint = Blue600, modifier = Modifier.size(48.dp))
-            }
+            // Hero
             Column(
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text(hospedaje.nombre, style = MaterialTheme.typography.titleLarge, color = Gray900)
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Icon(Icons.Default.LocationOn, null, tint = Gray500, modifier = Modifier.size(16.dp))
-                    Text(hospedaje.ubicacion, style = MaterialTheme.typography.bodyMedium, color = Gray600)
+                Text("Encuentra tu hotel ideal", style = MaterialTheme.typography.displayLarge, color = Gray900)
+                Text("Miles de opciones de alojamiento al mejor precio", style = MaterialTheme.typography.bodyLarge, color = Gray600)
+            }
+
+            // Search Form Card
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(16.dp).background(White)
+                    .padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                THInput(
+                    viewModel.destino, { viewModel.destino = it }, "Destino", "¿A dónde viajas?", Icons.Default.LocationOn,
+                    testTag = "input_destino"
+                )
+
+                val dateFormatter = remember { SimpleDateFormat("yyyy-MM-dd", Locale.ROOT) }
+                val checkInTime = remember(viewModel.checkIn) {
+                    try { dateFormatter.parse(viewModel.checkIn.substringBefore('T'))?.time } catch (_: Exception) { null }
                 }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Icon(Icons.Default.Star, null, tint = StarYellow, modifier = Modifier.size(15.dp))
-                    Text(hospedaje.rating, style = MaterialTheme.typography.titleSmall, color = Gray900)
+                val checkOutTime = remember(viewModel.checkOut) {
+                    try { dateFormatter.parse(viewModel.checkOut.substringBefore('T'))?.time } catch (_: Exception) { null }
                 }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column {
-                        Text(hospedaje.precioPorNoche, style = MaterialTheme.typography.headlineLarge, color = Blue600)
-                        Text("por noche", style = MaterialTheme.typography.bodySmall, color = Gray500)
-                    }
-                    Button(
-                        onClick = onReservar,
-                        shape = RoundedCornerShape(10.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Blue600),
-                        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp)
-                    ) {
-                        Text("Reservar", style = MaterialTheme.typography.labelMedium, color = White)
-                    }
+
+                THDatePicker(
+                    value = viewModel.checkIn.substringBefore('T'),
+                    onValueChange = { viewModel.checkIn = "${it}T12:00:00" },
+                    label = "Check-in",
+                    placeholder = "Selecciona fecha",
+                    minDate = System.currentTimeMillis(),
+                    maxDate = checkOutTime,
+                    testTag = "picker_checkin"
+                )
+
+                THDatePicker(
+                    value = viewModel.checkOut.substringBefore('T'),
+                    onValueChange = { viewModel.checkOut = "${it}T12:00:00" },
+                    label = "Check-out",
+                    placeholder = "Selecciona fecha",
+                    minDate = checkInTime ?: System.currentTimeMillis(),
+                    testTag = "picker_checkout"
+                )
+
+                THInput(
+                    viewModel.guests,
+                    onValueChange = { newValue ->
+                        if (newValue.isEmpty()) {
+                            viewModel.guests = ""
+                        } else if (newValue.all { it.isDigit() } && (newValue.toIntOrNull() ?: 0) <= 20) {
+                            viewModel.guests = newValue
+                        }
+                    },
+                    "Huéspedes",
+                    "Máximo 20",
+                    Icons.Default.People,
+                    keyboardType = KeyboardType.Number,
+                    testTag = "input_guests"
+                )
+
+                if (viewModel.isLoading) {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                } else {
+                    THButton("Buscar hoteles", onClick = {
+                        viewModel.searchRooms(onSuccess = onReservar)
+                    }, modifier = Modifier.testTag("btn_search"))
+                }
+
+                viewModel.error?.let {
+                    Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
                 }
             }
+            Spacer(Modifier.height(80.dp))
         }
     }
 }

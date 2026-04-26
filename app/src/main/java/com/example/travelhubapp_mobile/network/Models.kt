@@ -50,3 +50,86 @@ data class ProfileResponse(
     val status: String?,
     val role: String?
 )
+
+// === Hotels ===
+data class HotelSearchRequest(
+    val destination: String,
+    val checkIn: String,
+    val checkOut: String,
+    val guests: Int = 2
+)
+
+data class HotelResponse(
+    val id: String,
+    val name: String,
+    val rating: String,
+    val price: String,
+    val reviews: String?,
+    val location: String?,
+    val image: String?
+)
+
+// === Rooms ===
+data class RoomResponse(
+    val id: String,
+    @SerializedName("hotel_id") val hotelId: String,
+    @SerializedName("hotel_name") val hotelName: String?,
+    val destination: String?,
+    val name: String,
+    @SerializedName("room_type") val roomType: String?,
+    val price: String,
+    val capacity: Int,
+    val beds: String?,
+    val size: Double?,
+    val status: String?,
+    val amenities: String?,
+    @SerializedName("created_at") val createdAt: String?,
+    @SerializedName("updated_at") val updatedAt: String?
+)
+
+// === Bookings ===
+data class BookingRequest(
+    @SerializedName("hotel_id") val hotelId: String,
+    @SerializedName("room_id") val roomId: String,
+    @SerializedName("start_time") val startTime: String,
+    @SerializedName("end_time") val endTime: String,
+    @SerializedName("room_type") val roomType: String,
+    @SerializedName("num_guests") val numGuests: Int,
+    @SerializedName("price_per_night") val pricePerNight: Double,
+    @SerializedName("traveler_name") val travelerName: String,
+    @SerializedName("traveler_email") val travelerEmail: String,
+    @SerializedName("traveler_phone") val travelerPhone: String,
+    @SerializedName("traveler_document") val travelerDocument: String,
+    val notes: String = "Test booking",
+    @SerializedName("special_requests") val specialRequests: String = "Late check-in"
+)
+
+data class BookingResponse(
+    val id: String? = null,
+    @SerializedName("user_id") val userId: String? = null,
+    @SerializedName("hotel_id") val hotelId: String? = null,
+    @SerializedName("room_id") val roomId: String? = null,
+    @SerializedName("start_time") val startTime: String? = null,
+    @SerializedName("end_time") val endTime: String? = null,
+    val status: String? = null,
+    @SerializedName("status_display") val statusDisplay: String? = null,
+    val notes: String? = null,
+    @SerializedName("booking_code") val bookingCode: String? = null,
+    @SerializedName("room_type") val roomType: String? = null,
+    @SerializedName("num_guests") val numGuests: Int? = null,
+    @SerializedName("additional_guests") val additionalGuests: List<String>? = null,
+    @SerializedName("special_requests") val specialRequests: String? = null,
+    @SerializedName("price_per_night") val pricePerNight: String? = null,
+    @SerializedName("total_nights") val totalNights: Int? = null,
+    @SerializedName("total_price") val totalPrice: String? = null,
+    val taxes: String? = null,
+    @SerializedName("final_price") val finalPrice: String? = null,
+    @SerializedName("traveler_name") val travelerName: String? = null,
+    @SerializedName("traveler_email") val travelerEmail: String? = null,
+    @SerializedName("traveler_phone") val travelerPhone: String? = null,
+    @SerializedName("traveler_document") val travelerDocument: String? = null,
+    val cancellable: Boolean? = null,
+    @SerializedName("created_at") val createdAt: String? = null,
+    @SerializedName("updated_at") val updatedAt: String? = null,
+    val message: String? = null
+)

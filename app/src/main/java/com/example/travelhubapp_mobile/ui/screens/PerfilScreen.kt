@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.example.travelhubapp_mobile.ui.components.BluGradient
 import com.example.travelhubapp_mobile.ui.components.CardShape
@@ -54,12 +55,17 @@ import com.example.travelhubapp_mobile.ui.theme.SuccessLight
 import com.example.travelhubapp_mobile.ui.theme.White
 
 @Composable
-fun PerfilScreen(onLogout: () -> Unit, onHome: () -> Unit = {}) {
+fun PerfilScreen(onLogout: () -> Unit, onHome: () -> Unit, onMisReservas: () -> Unit) {
     Scaffold(
         bottomBar = {
             THBottomBar(
-                selected = 1,
-                onSelect = { if (it == 0) onHome() },
+                selected = 2,
+                onSelect = { 
+                    when(it) {
+                        0 -> onHome()
+                        1 -> onMisReservas()
+                    }
+                },
                 onLogout = onLogout
             )
         }
@@ -102,7 +108,7 @@ fun PerfilScreen(onLogout: () -> Unit, onHome: () -> Unit = {}) {
                 onClick = onLogout,
                 shape = RoundedCornerShape(10.dp),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = Destructive),
-                modifier = Modifier.fillMaxWidth().height(50.dp)
+                modifier = Modifier.fillMaxWidth().height(50.dp).testTag("btn_logout")
             ) {
                 Icon(Icons.AutoMirrored.Filled.Logout, null, modifier = Modifier.size(19.dp))
                 Spacer(Modifier.width(8.dp))

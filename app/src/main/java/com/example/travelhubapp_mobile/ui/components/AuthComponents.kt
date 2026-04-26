@@ -18,6 +18,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
@@ -47,6 +49,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -59,6 +62,7 @@ import com.example.travelhubapp_mobile.ui.theme.Gray400
 import com.example.travelhubapp_mobile.ui.theme.Gray600
 import com.example.travelhubapp_mobile.ui.theme.Gray700
 import com.example.travelhubapp_mobile.ui.theme.White
+import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
@@ -86,7 +90,9 @@ fun THInput(
     placeholder: String = "",
     leadingIcon: ImageVector? = null,
     isPassword: Boolean = false,
-    modifier: Modifier = Modifier
+    keyboardType: KeyboardType = KeyboardType.Text,
+    modifier: Modifier = Modifier,
+    testTag: String? = null
 ) {
     var visible by remember { mutableStateOf(false) }
     Column(
@@ -112,15 +118,15 @@ fun THInput(
             } else null,
             visualTransformation = if (isPassword && !visible)
                 PasswordVisualTransformation() else VisualTransformation.None,
-            keyboardOptions = if (isPassword)
-                KeyboardOptions(keyboardType = KeyboardType.Password)
-                else KeyboardOptions.Default,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = if (isPassword) KeyboardType.Password else keyboardType
+            ),
             shape = RoundedCornerShape(10.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 unfocusedBorderColor = Gray300, focusedBorderColor = Blue600
             ),
             singleLine = true,
-            modifier = Modifier.fillMaxWidth().height(50.dp)
+            modifier = Modifier.fillMaxWidth().height(50.dp).then(if (testTag != null) Modifier.testTag(testTag) else Modifier)
         )
     }
 }
@@ -182,13 +188,27 @@ fun THDatePicker(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
-    modifier: Modifier = Modifier
+    placeholder: String = "dd/mm/aaaa",
+    minDate: Long? = null,
+    maxDate: Long? = null,
+    initialDate: Long? = null,
+    modifier: Modifier = Modifier,
+    testTag: String? = null
 ) {
     val context = LocalContext.current
-    val calendar = Calendar.getInstance()
-
+    
     val showDialog = {
-        DatePickerDialog(
+        val calendar = Calendar.getInstance()
+        if (value.isNotBlank()) {
+            try {
+                val date = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).parse(value)
+                if (date != null) calendar.time = date
+            } catch (_: Exception) {}
+        } else if (initialDate != null) {
+            calendar.timeInMillis = initialDate
+        }
+
+        val dpd = DatePickerDialog(
             context,
             { _, year, month, day ->
                 val formatted = String.format(
@@ -196,10 +216,13 @@ fun THDatePicker(
                 )
                 onValueChange(formatted)
             },
-            calendar.get(Calendar.YEAR) - 25,
+            calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH),
             calendar.get(Calendar.DAY_OF_MONTH)
-        ).show()
+        )
+        minDate?.let { dpd.datePicker.minDate = it }
+        maxDate?.let { dpd.datePicker.maxDate = it }
+        dpd.show()
     }
 
     Column(
@@ -207,13 +230,13 @@ fun THDatePicker(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(label, style = MaterialTheme.typography.titleSmall, color = Gray700)
-        Box {
+        Box(modifier = if (testTag != null) Modifier.testTag(testTag) else Modifier) {
             OutlinedTextField(
                 value = value,
                 onValueChange = {},
                 readOnly = true,
                 enabled = false,
-                placeholder = { Text("dd/mm/aaaa", color = Gray400) },
+                placeholder = { Text(placeholder, color = Gray400) },
                 leadingIcon = {
                     Icon(
                         Icons.Default.CalendarMonth, null,
@@ -288,6 +311,17 @@ fun THBottomBar(selected: Int, onSelect: (Int) -> Unit, onLogout: () -> Unit) {
         NavigationBarItem(
             selected = selected == 1,
             onClick = { onSelect(1) },
+            icon = { Icon(Icons.Default.Favorite, "Mis reservas", modifier = Modifier.size(23.dp)) },
+            label = { Text("Reservas", style = MaterialTheme.typography.labelSmall) },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = Blue600, selectedTextColor = Blue600,
+                unselectedIconColor = Gray600, unselectedTextColor = Gray600,
+                indicatorColor = Color.Transparent
+            )
+        )
+        NavigationBarItem(
+            selected = selected == 2,
+            onClick = { onSelect(2) },
             icon = { Icon(Icons.Default.Person, "Perfil", modifier = Modifier.size(23.dp)) },
             label = { Text("Perfil", style = MaterialTheme.typography.labelSmall) },
             colors = NavigationBarItemDefaults.colors(

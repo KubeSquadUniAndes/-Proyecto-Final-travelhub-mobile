@@ -1,10 +1,13 @@
 package com.example.travelhubapp_mobile.ui.screens
 
-import androidx.compose.ui.test.assertIsDisplayed
+import android.content.Context
+import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performScrollTo
+import androidx.test.core.app.ApplicationProvider
+import com.example.travelhubapp_mobile.data.TokenManager
 import com.example.travelhubapp_mobile.ui.theme.TravelHubAppMobileTheme
+import com.example.travelhubapp_mobile.ui.viewmodels.HotelViewModel
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -18,75 +21,112 @@ class HomeScreenRoboTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    @Test
-    fun displaysTitle() {
-        composeTestRule.setContent {
-            TravelHubAppMobileTheme { HomeScreen() }
-        }
-        composeTestRule.onNodeWithText("TravelHub").assertIsDisplayed()
+    private lateinit var viewModel: HotelViewModel
+
+    @Before
+    fun setup() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val tokenManager = TokenManager(context)
+        viewModel = HotelViewModel(tokenManager)
+        viewModel.skipNetworkForTests = true
     }
 
     @Test
-    fun displaysSubtitle() {
+    fun displaysBasicInfo() {
         composeTestRule.setContent {
-            TravelHubAppMobileTheme { HomeScreen() }
+            TravelHubAppMobileTheme {
+                HomeScreen(
+                    onReservar = {},
+                    onPerfil = {},
+                    onMisReservas = {},
+                    onLogout = {},
+                    viewModel = viewModel
+                )
+            }
         }
-        composeTestRule.onNodeWithText("Hospedajes disponibles").assertIsDisplayed()
+        composeTestRule.onNodeWithText("TravelHub").assertExists()
     }
 
     @Test
-    fun displaysLoadingIndicator() {
+    fun displaysSearchFormFields() {
         composeTestRule.setContent {
-            TravelHubAppMobileTheme { HomeScreen() }
+            TravelHubAppMobileTheme {
+                HomeScreen(
+                    onReservar = {},
+                    onPerfil = {},
+                    onMisReservas = {},
+                    onLogout = {},
+                    viewModel = viewModel
+                )
+            }
         }
-        composeTestRule.onNodeWithText("Cargando hospedajes...").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("input_destino", useUnmergedTree = true).assertExists()
+        composeTestRule.onNodeWithTag("input_guests", useUnmergedTree = true).assertExists()
+        composeTestRule.onNodeWithTag("btn_search").assertExists()
     }
 
     @Test
-    fun displaysHospedajesAfterLoading() {
+    fun destinationInput_updatesViewModel() {
         composeTestRule.setContent {
-            TravelHubAppMobileTheme { HomeScreen() }
+            TravelHubAppMobileTheme {
+                HomeScreen(
+                    onReservar = {},
+                    onPerfil = {},
+                    onMisReservas = {},
+                    onLogout = {},
+                    viewModel = viewModel
+                )
+            }
         }
-        composeTestRule.mainClock.advanceTimeBy(2000)
-        composeTestRule.onNodeWithText("Hotel Grand Luxury").assertIsDisplayed()
+        
+        composeTestRule.onNodeWithTag("input_destino", useUnmergedTree = true).performTextInput("Cartagena")
+        assert(viewModel.destino == "Cartagena")
     }
 
     @Test
-    fun displaysReservarButton() {
+    fun guestsInput_validation() {
         composeTestRule.setContent {
-            TravelHubAppMobileTheme { HomeScreen() }
+            TravelHubAppMobileTheme {
+                HomeScreen(
+                    onReservar = {},
+                    onPerfil = {},
+                    onMisReservas = {},
+                    onLogout = {},
+                    viewModel = viewModel
+                )
+            }
         }
-        composeTestRule.mainClock.advanceTimeBy(2000)
-        composeTestRule.onNodeWithText("Reservar")
-            .performScrollTo().assertIsDisplayed()
+        
+        val guestsNode = composeTestRule.onNodeWithTag("input_guests", useUnmergedTree = true)
+        
+        guestsNode.performTextReplacement("5")
+        assert(viewModel.guests == "5")
+
+        guestsNode.performTextReplacement("25")
+        assert(viewModel.guests == "5") // should not update if > 20
     }
 
     @Test
-    fun displaysHospedajeCount() {
+    fun bottomBar_navigation() {
+        var profileClicked = false
+        var misReservasClicked = false
+        
         composeTestRule.setContent {
-            TravelHubAppMobileTheme { HomeScreen() }
+            TravelHubAppMobileTheme {
+                HomeScreen(
+                    onReservar = {},
+                    onPerfil = { profileClicked = true },
+                    onMisReservas = { misReservasClicked = true },
+                    onLogout = {},
+                    viewModel = viewModel
+                )
+            }
         }
-        composeTestRule.mainClock.advanceTimeBy(2000)
-        composeTestRule.onNodeWithText("5 hospedajes disponibles").assertIsDisplayed()
-    }
-
-    @Test
-    fun displaysHospedajeLocation() {
-        composeTestRule.setContent {
-            TravelHubAppMobileTheme { HomeScreen() }
-        }
-        composeTestRule.mainClock.advanceTimeBy(2000)
-        composeTestRule.onNodeWithText("Bogotá, Colombia")
-            .performScrollTo().assertIsDisplayed()
-    }
-
-    @Test
-    fun displaysHospedajePrice() {
-        composeTestRule.setContent {
-            TravelHubAppMobileTheme { HomeScreen() }
-        }
-        composeTestRule.mainClock.advanceTimeBy(2000)
-        composeTestRule.onNodeWithText("COP 600,000")
-            .performScrollTo().assertIsDisplayed()
+        
+        composeTestRule.onNode(hasText("Reservas") and hasClickAction()).performClick()
+        assert(misReservasClicked)
+        
+        composeTestRule.onNode(hasText("Perfil") and hasClickAction()).performClick()
+        assert(profileClicked)
     }
 }
