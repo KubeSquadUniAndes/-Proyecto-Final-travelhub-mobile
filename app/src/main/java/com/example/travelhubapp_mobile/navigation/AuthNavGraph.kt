@@ -72,6 +72,13 @@ fun AuthNavGraph() {
         composable(Routes.RESERVA) {
             ReservaScreen(
                 onBack = { navController.popBackStack() },
+                onSuccess = { navController.navigate(Routes.CONFIRMACION) },
+                viewModel = hotelViewModel
+            )
+        }
+        composable(Routes.CONFIRMACION) {
+            ConfirmacionReservaScreen(
+                onHome = { navController.navigate(Routes.HOME) { popUpTo(Routes.HOME) { inclusive = true } } },
                 viewModel = hotelViewModel
             )
         }

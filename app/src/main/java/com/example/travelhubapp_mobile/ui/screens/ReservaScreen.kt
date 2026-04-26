@@ -33,12 +33,11 @@ import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReservaScreen(onBack: () -> Unit, viewModel: HotelViewModel) {
+fun ReservaScreen(onBack: () -> Unit, onSuccess: () -> Unit, viewModel: HotelViewModel) {
     var nombre by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var telefono by remember { mutableStateOf("") }
     var documento by remember { mutableStateOf("") }
-    var showSuccess by remember { mutableStateOf(false) }
 
     // Payment fields
     var cardNumber by remember { mutableStateOf("") }
@@ -113,7 +112,7 @@ fun ReservaScreen(onBack: () -> Unit, viewModel: HotelViewModel) {
                                 travelerEmail = email,
                                 travelerPhone = telefono,
                                 travelerDocument = documento,
-                                onSuccess = { showSuccess = true }
+                                onSuccess = onSuccess
                             )
                         },
                         modifier = Modifier.fillMaxWidth()
@@ -123,18 +122,6 @@ fun ReservaScreen(onBack: () -> Unit, viewModel: HotelViewModel) {
         },
         containerColor = Gray50
     ) { innerPadding ->
-        if (showSuccess) {
-            AlertDialog(
-                onDismissRequest = { showSuccess = false; onBack() },
-                title = { Text("Reserva exitosa") },
-                text = { Text("Tu reserva ha sido confirmada correctamente.") },
-                confirmButton = {
-                    Button(onClick = { showSuccess = false; onBack() }) {
-                        Text("Aceptar")
-                    }
-                }
-            )
-        }
         Column(
             modifier = Modifier
                 .padding(innerPadding)

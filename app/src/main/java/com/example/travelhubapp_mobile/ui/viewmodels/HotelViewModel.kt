@@ -22,6 +22,7 @@ class HotelViewModel(private val tokenManager: TokenManager) : ViewModel() {
         private set
 
     var selectedRoom by mutableStateOf<RoomResponse?>(null)
+    var lastBooking by mutableStateOf<BookingResponse?>(null)
 
     var isLoading by mutableStateOf(false)
         private set
@@ -126,6 +127,7 @@ class HotelViewModel(private val tokenManager: TokenManager) : ViewModel() {
                 )
 
                 if (response.isSuccessful) {
+                    lastBooking = response.body()
                     onSuccess()
                 } else {
                     error = "Error al crear reserva: ${response.message()}"
