@@ -49,4 +49,10 @@ interface ApiService {
         @Path("id") id: String,
         @Header("Authorization") token: String
     ): Response<BookingResponse>
+
+    @PATCH("reservas/api/v1/bookings/{id}/approve")
+    suspend fun approveBooking(
+        @Path("id") id: String,
+        @Header("Authorization") token: String
+    ): Response<BookingResponse>
 }

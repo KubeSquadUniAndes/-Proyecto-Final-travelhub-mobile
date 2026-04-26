@@ -131,7 +131,20 @@ class HotelViewModel(private val tokenManager: TokenManager) : ViewModel() {
                 )
 
                 if (response.isSuccessful) {
-                    lastBooking = response.body()
+                    val createdBooking = response.body()
+                    lastBooking = createdBooking
+                    
+                    // Approve the booking
+                    createdBooking?.id?.let { bookingId ->
+                        val approveResponse = RetrofitClient.api.approveBooking(
+                            id = bookingId,
+                            token = "Bearer $token"
+                        )
+                        if (approveResponse.isSuccessful) {
+                            lastBooking = approveResponse.body()
+                        }
+                    }
+
                     onSuccess()
                 } else {
                     error = "Error al crear reserva: ${response.message()}"
