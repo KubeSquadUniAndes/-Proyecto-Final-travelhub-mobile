@@ -92,7 +92,14 @@ fun AuthNavGraph() {
         composable(Routes.BUSCAR_HOTELES) {
             BuscarHotelesScreen(
                 onBack = { navController.popBackStack() },
-                onHotelClick = { navController.navigate(Routes.RESERVA) },
+                onHotelClick = { navController.navigate(Routes.DETALLE_HABITACION) },
+                viewModel = hotelViewModel
+            )
+        }
+        composable(Routes.DETALLE_HABITACION) {
+            HabitacionDetalleScreen(
+                onBack = { navController.popBackStack() },
+                onReservar = { navController.navigate(Routes.RESERVA) },
                 viewModel = hotelViewModel
             )
         }

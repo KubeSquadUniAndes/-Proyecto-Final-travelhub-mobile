@@ -55,6 +55,12 @@ interface ApiService {
         @Header("Authorization") token: String
     ): Response<BookingResponse>
 
+    @GET("hospedajes/api/v1/rooms/{roomId}/images")
+    suspend fun getRoomImages(
+        @Path("roomId") roomId: String,
+        @Header("Authorization") token: String
+    ): Response<List<RoomImageResponse>>
+
     @PATCH("reservas/api/v1/bookings/{id}/approve")
     suspend fun approveBooking(
         @Path("id") id: String,

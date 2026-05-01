@@ -87,6 +87,14 @@ data class RoomResponse(
     @SerializedName("updated_at") val updatedAt: String?
 )
 
+// === Room Images ===
+data class RoomImageResponse(
+    val id: String,
+    @SerializedName("room_id") val roomId: String,
+    val url: String,
+    @SerializedName("created_at") val createdAt: String?
+)
+
 // === Bookings ===
 data class BookingRequest(
     @SerializedName("hotel_id") val hotelId: String,
