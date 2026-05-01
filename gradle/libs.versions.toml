@@ -18,6 +18,7 @@ datastore = "1.1.1"
 robolectric = "4.14.1"
 kover = "0.8.3"
 detekt = "1.23.7"
+coil = "2.7.0"
 media3CommonKtx = "1.10.0"
 
 [libraries]
@@ -44,6 +45,7 @@ retrofit-gson = { group = "com.squareup.retrofit2", name = "converter-gson", ver
 okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 androidx-datastore = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
+coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 androidx-media3-common-ktx = { group = "androidx.media3", name = "media3-common-ktx", version.ref = "media3CommonKtx" }
 
 [plugins]

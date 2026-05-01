@@ -2,47 +2,12 @@
 <SmellBaseline>
   <ManuallySuppressedIssues></ManuallySuppressedIssues>
   <CurrentIssues>
-    <ID>ForbiddenComment:AuthNavGraph.kt$/* TODO: autenticar y navegar a Home */</ID>
-    <ID>ForbiddenComment:AuthNavGraph.kt$/* TODO: crear cuenta y navegar a Home */</ID>
-    <ID>MaxLineLength:AuthComponents.kt$Icon(if (visible) Icons.Default.VisibilityOff else Icons.Default.Visibility, null, tint = Gray400, modifier = Modifier.size(19.dp))</ID>
-    <ID>MaxLineLength:RegistroScreen.kt$THInput(confirmPassword, { confirmPassword = it }, "Confirmar contraseña", "Repite tu contraseña", Icons.Default.Lock, isPassword = true)</ID>
+    <ID>CyclomaticComplexMethod:HomeScreen.kt$@Composable fun HomeScreen( onReservar: () -&gt; Unit, onPerfil: () -&gt; Unit, onMisReservas: () -&gt; Unit, onLogout: () -&gt; Unit, viewModel: HotelViewModel )</ID>
     <ID>NewLineAtEndOfFile:ExampleInstrumentedTest.kt$com.example.travelhubapp_mobile.ExampleInstrumentedTest.kt</ID>
-    <ID>PackageNaming:AuthComponents.kt$package com.example.travelhubapp_mobile.ui.components</ID>
-    <ID>PackageNaming:AuthComponentsRoboTest.kt$package com.example.travelhubapp_mobile.ui.components</ID>
-    <ID>PackageNaming:AuthComponentsTest.kt$package com.example.travelhubapp_mobile.ui.components</ID>
-    <ID>PackageNaming:AuthNavGraph.kt$package com.example.travelhubapp_mobile.navigation</ID>
-    <ID>PackageNaming:AuthNavGraphRoboTest.kt$package com.example.travelhubapp_mobile.navigation</ID>
-    <ID>PackageNaming:AuthNavGraphTest.kt$package com.example.travelhubapp_mobile.navigation</ID>
-    <ID>PackageNaming:BienvenidaScreen.kt$package com.example.travelhubapp_mobile.ui.screens</ID>
-    <ID>PackageNaming:BienvenidaScreenRoboTest.kt$package com.example.travelhubapp_mobile.ui.screens</ID>
-    <ID>PackageNaming:BienvenidaScreenTest.kt$package com.example.travelhubapp_mobile.ui.screens</ID>
-    <ID>PackageNaming:Color.kt$package com.example.travelhubapp_mobile.ui.theme</ID>
-    <ID>PackageNaming:ColorTest.kt$package com.example.travelhubapp_mobile.ui.theme</ID>
-    <ID>PackageNaming:ExampleInstrumentedTest.kt$package com.example.travelhubapp_mobile</ID>
-    <ID>PackageNaming:ExampleUnitTest.kt$package com.example.travelhubapp_mobile</ID>
-    <ID>PackageNaming:LoginScreen.kt$package com.example.travelhubapp_mobile.ui.screens</ID>
-    <ID>PackageNaming:LoginScreenRoboTest.kt$package com.example.travelhubapp_mobile.ui.screens</ID>
-    <ID>PackageNaming:LoginScreenTest.kt$package com.example.travelhubapp_mobile.ui.screens</ID>
-    <ID>PackageNaming:MainActivity.kt$package com.example.travelhubapp_mobile</ID>
-    <ID>PackageNaming:RegistroScreen.kt$package com.example.travelhubapp_mobile.ui.screens</ID>
-    <ID>PackageNaming:RegistroScreenRoboTest.kt$package com.example.travelhubapp_mobile.ui.screens</ID>
-    <ID>PackageNaming:RegistroScreenTest.kt$package com.example.travelhubapp_mobile.ui.screens</ID>
-    <ID>PackageNaming:Routes.kt$package com.example.travelhubapp_mobile.navigation</ID>
-    <ID>PackageNaming:RoutesTest.kt$package com.example.travelhubapp_mobile.navigation</ID>
-    <ID>PackageNaming:Theme.kt$package com.example.travelhubapp_mobile.ui.theme</ID>
-    <ID>PackageNaming:Type.kt$package com.example.travelhubapp_mobile.ui.theme</ID>
-    <ID>PackageNaming:TypographyTest.kt$package com.example.travelhubapp_mobile.ui.theme</ID>
-    <ID>WildcardImport:AuthComponents.kt$import androidx.compose.runtime.*</ID>
-    <ID>WildcardImport:AuthComponents.kt$import com.example.travelhubapp_mobile.ui.theme.*</ID>
+    <ID>TooManyFunctions:ApiService.kt$ApiService</ID>
     <ID>WildcardImport:AuthNavGraph.kt$import com.example.travelhubapp_mobile.ui.screens.*</ID>
     <ID>WildcardImport:BienvenidaScreen.kt$import com.example.travelhubapp_mobile.ui.theme.*</ID>
     <ID>WildcardImport:ExampleInstrumentedTest.kt$import org.junit.Assert.*</ID>
     <ID>WildcardImport:ExampleUnitTest.kt$import org.junit.Assert.*</ID>
-    <ID>WildcardImport:LoginScreen.kt$import androidx.compose.runtime.*</ID>
-    <ID>WildcardImport:LoginScreen.kt$import com.example.travelhubapp_mobile.ui.components.*</ID>
-    <ID>WildcardImport:LoginScreen.kt$import com.example.travelhubapp_mobile.ui.theme.*</ID>
-    <ID>WildcardImport:RegistroScreen.kt$import androidx.compose.runtime.*</ID>
-    <ID>WildcardImport:RegistroScreen.kt$import com.example.travelhubapp_mobile.ui.components.*</ID>
-    <ID>WildcardImport:RegistroScreen.kt$import com.example.travelhubapp_mobile.ui.theme.*</ID>
   </CurrentIssues>
 </SmellBaseline>
