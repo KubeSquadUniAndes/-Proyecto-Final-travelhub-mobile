@@ -11,6 +11,7 @@ import com.example.travelhubapp_mobile.network.BookingResponse
 import com.example.travelhubapp_mobile.network.HotelResponse
 import com.example.travelhubapp_mobile.network.HotelSearchRequest
 import com.example.travelhubapp_mobile.network.RetrofitClient
+import com.example.travelhubapp_mobile.network.RoomImageResponse
 import com.example.travelhubapp_mobile.network.RoomResponse
 import java.io.IOException
 import kotlinx.coroutines.launch
@@ -28,6 +29,8 @@ class HotelViewModel(private val tokenManager: TokenManager) : ViewModel() {
     var lastBooking by mutableStateOf<BookingResponse?>(null)
     var myBookings by mutableStateOf<List<BookingResponse>>(emptyList())
     var selectedBookingDetails by mutableStateOf<BookingResponse?>(null)
+    var roomImages by mutableStateOf<List<RoomImageResponse>>(emptyList())
+    var roomImagesMap by mutableStateOf<Map<String, String>>(emptyMap())
 
     var isLoading by mutableStateOf(false)
     var error by mutableStateOf<String?>(null)
@@ -85,6 +88,7 @@ class HotelViewModel(private val tokenManager: TokenManager) : ViewModel() {
 
                 if (response.isSuccessful) {
                     roomResults = response.body() ?: emptyList()
+                    fetchAllRoomImages(roomResults.map { it.id })
                     onSuccess()
                 } else {
                     error = "Error al buscar habitaciones: ${response.message()}"
@@ -162,6 +166,43 @@ class HotelViewModel(private val tokenManager: TokenManager) : ViewModel() {
                 error = "Error HTTP: ${e.message}"
             } finally {
                 isLoading = false
+            }
+        }
+    }
+
+    fun fetchAllRoomImages(roomIds: List<String>) {
+        if (skipNetworkForTests) return
+        viewModelScope.launch {
+            val token = tokenManager.getToken() ?: return@launch
+            val map = mutableMapOf<String, String>()
+            roomIds.map { id ->
+                launch {
+                    try {
+                        val response = RetrofitClient.api.getRoomImages(id, "Bearer $token")
+                        if (response.isSuccessful) {
+                            response.body()?.firstOrNull()?.url?.let { map[id] = it }
+                        }
+                    } catch (_: Exception) {}
+                }
+            }.forEach { it.join() }
+            roomImagesMap = map.toMap()
+        }
+    }
+
+    fun fetchRoomImages(roomId: String) {
+        if (skipNetworkForTests) return
+        roomImages = emptyList()
+        viewModelScope.launch {
+            try {
+                val token = tokenManager.getToken() ?: return@launch
+                val response = RetrofitClient.api.getRoomImages(roomId, "Bearer $token")
+                if (response.isSuccessful) roomImages = response.body() ?: emptyList()
+            } catch (e: IOException) {
+                roomImages = emptyList()
+                error = e.message
+            } catch (e: HttpException) {
+                roomImages = emptyList()
+                error = e.message
             }
         }
     }

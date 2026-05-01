@@ -132,7 +132,11 @@ fun HomeScreen(
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                 } else {
                     THButton("Buscar hoteles", onClick = {
-                        viewModel.searchRooms(onSuccess = onReservar)
+                        when {
+                            viewModel.checkIn.isBlank() -> viewModel.error = "Por favor selecciona la fecha de check-in"
+                            viewModel.checkOut.isBlank() -> viewModel.error = "Por favor selecciona la fecha de check-out"
+                            else -> viewModel.searchRooms(onSuccess = onReservar)
+                        }
                     }, modifier = Modifier.testTag("btn_search"))
                 }
 

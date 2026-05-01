@@ -9,7 +9,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Bed
-import androidx.compose.material.icons.filled.Hotel
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.*
@@ -17,10 +16,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.travelhubapp_mobile.network.RoomResponse
 import com.example.travelhubapp_mobile.ui.components.CardShape
 import com.example.travelhubapp_mobile.ui.theme.Blue100
@@ -75,7 +78,7 @@ fun BuscarHotelesScreen(onBack: () -> Unit, onHotelClick: () -> Unit, viewModel:
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(viewModel.roomResults) { room ->
-                RoomCard(room, onClick = {
+                RoomCard(room, imageUrl = viewModel.roomImagesMap[room.id], onClick = {
                     viewModel.selectedRoom = room
                     onHotelClick()
                 })
@@ -87,7 +90,7 @@ fun BuscarHotelesScreen(onBack: () -> Unit, onHotelClick: () -> Unit, viewModel:
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun RoomCard(room: RoomResponse, onClick: () -> Unit) {
+fun RoomCard(room: RoomResponse, imageUrl: String? = null, onClick: () -> Unit) {
     Card(
         shape = CardShape,
         colors = CardDefaults.cardColors(containerColor = White),
@@ -95,12 +98,32 @@ fun RoomCard(room: RoomResponse, onClick: () -> Unit) {
         modifier = Modifier.testTag("room_card_${room.id}")
     ) {
         Column {
-            // Room Image Placeholder
+            // Room Image
             Box(
                 modifier = Modifier.fillMaxWidth().height(180.dp).background(Blue100),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Default.Hotel, null, tint = Blue600, modifier = Modifier.size(48.dp))
+                if (imageUrl != null) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(imageUrl)
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = "Foto habitación",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                } else {
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data("https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800")
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = "Foto habitación",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
                 Box(
                     modifier = Modifier.align(Alignment.TopEnd).padding(12.dp)
                         .background(White.copy(alpha = 0.9f), RoundedCornerShape(8.dp))

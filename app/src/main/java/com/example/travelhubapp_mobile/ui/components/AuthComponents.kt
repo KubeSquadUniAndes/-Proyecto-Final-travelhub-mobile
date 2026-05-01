@@ -1,6 +1,5 @@
 package com.example.travelhubapp_mobile.ui.components
 
-import android.app.DatePickerDialog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -9,16 +8,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.automirrored.filled.ExitToApp
-import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
@@ -26,8 +25,12 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -36,7 +39,10 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -48,12 +54,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import com.example.travelhubapp_mobile.ui.theme.Blue100
 import com.example.travelhubapp_mobile.ui.theme.Blue600
 import com.example.travelhubapp_mobile.ui.theme.Blue900
 import com.example.travelhubapp_mobile.ui.theme.Gray200
@@ -63,8 +69,8 @@ import com.example.travelhubapp_mobile.ui.theme.Gray600
 import com.example.travelhubapp_mobile.ui.theme.Gray700
 import com.example.travelhubapp_mobile.ui.theme.White
 import java.text.SimpleDateFormat
-import java.util.Calendar
 import java.util.Locale
+import java.util.TimeZone
 
 val BluGradient = Brush.linearGradient(listOf(Blue600, Blue900))
 val CardShape = RoundedCornerShape(10.dp)
@@ -183,46 +189,112 @@ fun THDropdown(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun THDatePicker(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
-    placeholder: String = "dd/mm/aaaa",
+    placeholder: String = "Selecciona fecha",
     minDate: Long? = null,
     maxDate: Long? = null,
     initialDate: Long? = null,
     modifier: Modifier = Modifier,
     testTag: String? = null
 ) {
-    val context = LocalContext.current
-    
-    val showDialog = {
-        val calendar = Calendar.getInstance()
-        if (value.isNotBlank()) {
-            try {
-                val date = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).parse(value)
-                if (date != null) calendar.time = date
-            } catch (_: Exception) {}
-        } else if (initialDate != null) {
-            calendar.timeInMillis = initialDate
-        }
+    var showDialog by remember { mutableStateOf(false) }
 
-        val dpd = DatePickerDialog(
-            context,
-            { _, year, month, day ->
-                val formatted = String.format(
-                    Locale.ROOT, "%04d-%02d-%02d", year, month + 1, day
-                )
-                onValueChange(formatted)
+    val formatter = remember { SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).apply { timeZone = TimeZone.getTimeZone("UTC") } }
+    val displayFormatter = remember { SimpleDateFormat("dd MMM yyyy", Locale("es", "CO")).apply { timeZone = TimeZone.getTimeZone("UTC") } }
+
+    val initialMillis = remember(value, initialDate) {
+        if (value.isNotBlank()) {
+            try { formatter.parse(value)?.time } catch (_: Exception) { null }
+        } else initialDate
+    }
+
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = initialMillis,
+        selectableDates = object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                val afterMin = minDate == null || utcTimeMillis >= minDate
+                val beforeMax = maxDate == null || utcTimeMillis <= maxDate
+                return afterMin && beforeMax
+            }
+        }
+    )
+
+    val displayValue = if (value.isNotBlank()) {
+        try { displayFormatter.format(formatter.parse(value)!!) } catch (_: Exception) { value }
+    } else ""
+
+    if (showDialog) {
+        DatePickerDialog(
+            onDismissRequest = { showDialog = false },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        datePickerState.selectedDateMillis?.let {
+                            onValueChange(formatter.format(it))
+                        }
+                        showDialog = false
+                    }
+                ) { Text("Aceptar", color = Blue600) }
             },
-            calendar.get(Calendar.YEAR),
-            calendar.get(Calendar.MONTH),
-            calendar.get(Calendar.DAY_OF_MONTH)
-        )
-        minDate?.let { dpd.datePicker.minDate = it }
-        maxDate?.let { dpd.datePicker.maxDate = it }
-        dpd.show()
+            dismissButton = {
+                TextButton(onClick = { showDialog = false }) {
+                    Text("Cancelar", color = Gray600)
+                }
+            },
+            colors = DatePickerDefaults.colors(
+                containerColor = White,
+                titleContentColor = Blue600,
+                headlineContentColor = Blue600,
+                weekdayContentColor = Gray600,
+                subheadContentColor = Gray600,
+                navigationContentColor = Blue600,
+                yearContentColor = Gray700,
+                currentYearContentColor = Blue600,
+                selectedYearContentColor = White,
+                selectedYearContainerColor = Blue600,
+                dayContentColor = Gray700,
+                selectedDayContentColor = White,
+                selectedDayContainerColor = Blue600,
+                todayContentColor = Blue600,
+                todayDateBorderColor = Blue600,
+                dayInSelectionRangeContentColor = White,
+                dayInSelectionRangeContainerColor = Blue100
+            )
+        ) {
+            DatePicker(
+                state = datePickerState,
+                colors = DatePickerDefaults.colors(
+                    containerColor = White,
+                    titleContentColor = Blue600,
+                    headlineContentColor = Blue600,
+                    weekdayContentColor = Gray600,
+                    subheadContentColor = Gray600,
+                    navigationContentColor = Blue600,
+                    yearContentColor = Gray700,
+                    currentYearContentColor = Blue600,
+                    selectedYearContentColor = White,
+                    selectedYearContainerColor = Blue600,
+                    dayContentColor = Gray700,
+                    selectedDayContentColor = White,
+                    selectedDayContainerColor = Blue600,
+                    todayContentColor = Blue600,
+                    todayDateBorderColor = Blue600
+                ),
+                title = {
+                    Text(
+                        label,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Blue600,
+                        modifier = Modifier.padding(start = 24.dp, top = 16.dp)
+                    )
+                }
+            )
+        }
     }
 
     Column(
@@ -232,32 +304,31 @@ fun THDatePicker(
         Text(label, style = MaterialTheme.typography.titleSmall, color = Gray700)
         Box(modifier = if (testTag != null) Modifier.testTag(testTag) else Modifier) {
             OutlinedTextField(
-                value = value,
+                value = displayValue,
                 onValueChange = {},
                 readOnly = true,
                 enabled = false,
                 placeholder = { Text(placeholder, color = Gray400) },
                 leadingIcon = {
+                    val iconTint = if (value.isNotBlank()) Blue600 else Gray400
                     Icon(
-                        Icons.Default.CalendarMonth, null,
-                        tint = Gray400, modifier = Modifier.size(19.dp)
+                        Icons.Default.CalendarMonth,
+                        null,
+                        tint = iconTint,
+                        modifier = Modifier.size(19.dp)
                     )
                 },
                 shape = RoundedCornerShape(10.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    disabledBorderColor = Gray300,
-                    disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                    disabledBorderColor = if (value.isNotBlank()) Blue600 else Gray300,
+                    disabledTextColor = Gray700,
                     disabledPlaceholderColor = Gray400,
-                    disabledLeadingIconColor = Gray400
+                    disabledLeadingIconColor = if (value.isNotBlank()) Blue600 else Gray400
                 ),
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth().height(50.dp)
             )
-            Box(
-                modifier = Modifier
-                    .matchParentSize()
-                    .clickable { showDialog() }
-            )
+            Box(modifier = Modifier.matchParentSize().clickable { showDialog = true })
         }
     }
 }
