@@ -1,9 +1,12 @@
 package com.example.travelhubapp_mobile.data
 
+import android.content.Context
+import com.example.travelhubapp_mobile.network.FcmTokenRequest
 import com.example.travelhubapp_mobile.network.LoginRequest
 import com.example.travelhubapp_mobile.network.ProfileResponse
 import com.example.travelhubapp_mobile.network.RegisterRequest
 import com.example.travelhubapp_mobile.network.RetrofitClient
+import com.example.travelhubapp_mobile.notifications.TokenRepository
 import java.io.IOException
 
 sealed class AuthResult<out T> {
@@ -11,7 +14,7 @@ sealed class AuthResult<out T> {
     data class Error(val message: String) : AuthResult<Nothing>()
 }
 
-class AuthRepository(private val tokenManager: TokenManager) {
+class AuthRepository(private val tokenManager: TokenManager, private val context: Context? = null) {
 
     private val api = RetrofitClient.api
 
@@ -77,8 +80,16 @@ class AuthRepository(private val tokenManager: TokenManager) {
             tokenManager.clearToken()
             AuthResult.Error("Acceso denegado: esta app es solo para viajeros")
         } else {
+            sendFcmToken(token)
             AuthResult.Success(token)
         }
+    }
+
+    private suspend fun sendFcmToken(authToken: String) {
+        try {
+            val fcmToken = context?.let { TokenRepository.getToken(it) } ?: return
+            api.registerFcmToken("Bearer $authToken", FcmTokenRequest(fcmToken))
+        } catch (_: Exception) { }
     }
 
     suspend fun getProfile(): AuthResult<ProfileResponse> {

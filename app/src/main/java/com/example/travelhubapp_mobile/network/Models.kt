@@ -87,6 +87,12 @@ data class RoomResponse(
     @SerializedName("updated_at") val updatedAt: String?
 )
 
+// === FCM Token ===
+data class FcmTokenRequest(
+    @SerializedName("fcm_token") val fcmToken: String,
+    val platform: String = "android"
+)
+
 // === Room Images ===
 data class RoomImageResponse(
     val id: String,

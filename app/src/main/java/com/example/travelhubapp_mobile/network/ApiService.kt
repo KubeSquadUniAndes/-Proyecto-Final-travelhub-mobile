@@ -66,4 +66,10 @@ interface ApiService {
         @Path("id") id: String,
         @Header("Authorization") token: String
     ): Response<BookingResponse>
+
+    @POST("users/api/v1/users/fcm-token")
+    suspend fun registerFcmToken(
+        @Header("Authorization") token: String,
+        @Body request: FcmTokenRequest
+    ): Response<Unit>
 }
