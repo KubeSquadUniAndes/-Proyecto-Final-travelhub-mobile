@@ -66,4 +66,23 @@ interface ApiService {
         @Path("id") id: String,
         @Header("Authorization") token: String
     ): Response<BookingResponse>
+
+    @POST("users/api/v1/users/fcm-token")
+    suspend fun registerFcmToken(
+        @Header("Authorization") token: String,
+        @Body request: FcmTokenRequest
+    ): Response<Unit>
+
+    @POST("pagos/api/v1/payments")
+    suspend fun createPayment(
+        @Header("Authorization") token: String,
+        @Body request: PaymentRequest
+    ): Response<PaymentResponse>
+
+    @POST("pagos/api/v1/payments/{bookingId}/confirm")
+    suspend fun confirmPayment(
+        @Path("bookingId") paymentId: String,
+        @Header("Authorization") token: String,
+        @Body request: PaymentConfirmRequest
+    ): Response<PaymentResponse>
 }

@@ -62,7 +62,7 @@ fun LoginScreen(
 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val authRepo = remember { AuthRepository(TokenManager(context)) }
+    val authRepo = remember { AuthRepository(TokenManager(context), context) }
 
     Column(
         modifier = Modifier.fillMaxSize().background(BluGradient)

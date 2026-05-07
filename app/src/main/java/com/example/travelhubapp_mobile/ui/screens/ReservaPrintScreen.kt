@@ -11,7 +11,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Hotel
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Phone
@@ -25,13 +24,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.travelhubapp_mobile.ui.theme.Blue600
 import com.example.travelhubapp_mobile.ui.theme.Gray100
 import com.example.travelhubapp_mobile.ui.theme.Gray200
-import com.example.travelhubapp_mobile.ui.theme.Gray400
 import com.example.travelhubapp_mobile.ui.theme.Gray50
 import com.example.travelhubapp_mobile.ui.theme.Gray600
 import com.example.travelhubapp_mobile.ui.theme.Gray700
@@ -52,6 +54,10 @@ fun ReservaPrintScreen(
     }
 
     val booking = viewModel.selectedBookingDetails
+
+    LaunchedEffect(booking?.roomId) {
+        booking?.roomId?.let { viewModel.fetchRoomImages(it) }
+    }
 
     Scaffold(
         topBar = {
@@ -119,7 +125,7 @@ fun ReservaPrintScreen(
                     elevation = CardDefaults.cardElevation(2.dp)
                 ) {
                     Column {
-                        // Image Placeholder
+                        // Image
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -127,7 +133,18 @@ fun ReservaPrintScreen(
                                 .background(Gray200),
                             contentAlignment = Alignment.Center
                         ) {
-                            Icon(Icons.Default.Hotel, null, tint = Gray400, modifier = Modifier.size(60.dp))
+                            AsyncImage(
+                                model = ImageRequest.Builder(LocalContext.current)
+                                    .data(
+                                        viewModel.roomImages.firstOrNull()?.url
+                                            ?: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800"
+                                    )
+                                    .crossfade(true)
+                                    .build(),
+                                contentDescription = "Foto habitación",
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.fillMaxSize()
+                            )
                         }
                         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             Text(
