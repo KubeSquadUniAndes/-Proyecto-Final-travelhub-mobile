@@ -87,12 +87,45 @@ data class RoomResponse(
     @SerializedName("updated_at") val updatedAt: String?
 )
 
+// === FCM Token ===
+data class FcmTokenRequest(
+    @SerializedName("fcm_token") val fcmToken: String,
+    val platform: String = "android"
+)
+
 // === Room Images ===
 data class RoomImageResponse(
     val id: String,
     @SerializedName("room_id") val roomId: String,
     val url: String,
     @SerializedName("created_at") val createdAt: String?
+)
+
+// === Payments ===
+data class PaymentRequest(
+    @SerializedName("booking_id") val bookingId: String,
+    val amount: Double,
+    val currency: String = "USD",
+    @SerializedName("payment_provider") val paymentProvider: String = "mock",
+    @SerializedName("payment_method") val paymentMethod: String = "credit_card",
+    @SerializedName("card_last_four") val cardLastFour: String,
+    @SerializedName("cardholder_name") val cardholderName: String,
+    @SerializedName("cardholder_email") val cardholderEmail: String
+)
+
+data class PaymentResponse(
+    val id: String? = null,
+    @SerializedName("booking_id") val bookingId: String? = null,
+    val status: String? = null,
+    val amount: String? = null,
+    val currency: String? = null,
+    @SerializedName("provider_transaction_id") val providerTransactionId: String? = null,
+    val message: String? = null
+)
+
+data class PaymentConfirmRequest(
+    @SerializedName("provider_transaction_id") val providerTransactionId: String,
+    @SerializedName("payment_timestamp") val paymentTimestamp: String
 )
 
 // === Bookings ===
@@ -137,6 +170,7 @@ data class BookingResponse(
     @SerializedName("traveler_phone") val travelerPhone: String? = null,
     @SerializedName("traveler_document") val travelerDocument: String? = null,
     val cancellable: Boolean? = null,
+    @SerializedName("payment_id") val paymentId: String? = null,
     @SerializedName("created_at") val createdAt: String? = null,
     @SerializedName("updated_at") val updatedAt: String? = null,
     val message: String? = null

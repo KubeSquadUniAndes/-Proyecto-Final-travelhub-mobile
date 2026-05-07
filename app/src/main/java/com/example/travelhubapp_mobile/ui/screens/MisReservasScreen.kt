@@ -7,27 +7,26 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Hotel
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.travelhubapp_mobile.network.BookingResponse
 import com.example.travelhubapp_mobile.ui.components.THBottomBar
+import com.example.travelhubapp_mobile.ui.theme.Blue100
 import com.example.travelhubapp_mobile.ui.theme.Blue600
 import com.example.travelhubapp_mobile.ui.theme.Gray100
 import com.example.travelhubapp_mobile.ui.theme.Gray200
-import com.example.travelhubapp_mobile.ui.theme.Gray400
 import com.example.travelhubapp_mobile.ui.theme.Gray600
-import com.example.travelhubapp_mobile.ui.theme.StarYellow
 import com.example.travelhubapp_mobile.ui.theme.White
 import com.example.travelhubapp_mobile.ui.viewmodels.HotelViewModel
 
@@ -37,11 +36,17 @@ fun MisReservasScreen(
     onPerfil: () -> Unit,
     onBuscarMas: () -> Unit,
     onBookingClick: (String) -> Unit,
+    onPagar: (String) -> Unit,
     onLogout: () -> Unit,
     viewModel: HotelViewModel
 ) {
     LaunchedEffect(Unit) {
         viewModel.fetchBookings()
+    }
+
+    LaunchedEffect(viewModel.myBookings) {
+        val roomIds = viewModel.myBookings.mapNotNull { it.roomId }.distinct()
+        if (roomIds.isNotEmpty()) viewModel.fetchAllRoomImages(roomIds)
     }
 
     Scaffold(
@@ -108,7 +113,12 @@ fun MisReservasScreen(
                     modifier = Modifier.weight(1f)
                 ) {
                     items(viewModel.myBookings) { booking ->
-                        ReservaCard(booking, onClick = { booking.id?.let { onBookingClick(it) } })
+                        ReservaCard(
+                            booking,
+                            imageUrl = booking.roomId?.let { viewModel.roomImagesMap[it] },
+                            onClick = { booking.id?.let { onBookingClick(it) } },
+                            onPagar = { booking.id?.let { onPagar(it) } }
+                        )
                     }
                 }
             }
@@ -138,7 +148,7 @@ fun MisReservasScreen(
 }
 
 @Composable
-fun ReservaCard(booking: BookingResponse, onClick: () -> Unit) {
+fun ReservaCard(booking: BookingResponse, imageUrl: String? = null, onClick: () -> Unit, onPagar: () -> Unit = {}) {
     Card(
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = White),
@@ -151,7 +161,7 @@ fun ReservaCard(booking: BookingResponse, onClick: () -> Unit) {
                 .fillMaxWidth()
                 .height(140.dp)
         ) {
-            // Placeholder for Image
+            // Image
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
@@ -159,7 +169,15 @@ fun ReservaCard(booking: BookingResponse, onClick: () -> Unit) {
                     .background(Gray200),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Default.Hotel, null, tint = Gray400, modifier = Modifier.size(40.dp))
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(imageUrl ?: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=400")
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = "Foto habitación",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
             }
 
             Column(
@@ -180,16 +198,40 @@ fun ReservaCard(booking: BookingResponse, onClick: () -> Unit) {
                         style = MaterialTheme.typography.bodySmall,
                         color = Gray600
                     )
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            Icons.Default.Star,
-                            null,
-                            tint = StarYellow,
-                            modifier = Modifier.size(16.dp)
+                    Spacer(Modifier.height(4.dp))
+                    val (badgeColor, textColor) = when {
+                        booking.paymentId != null && booking.status == "pending" -> Pair(
+                            androidx.compose.ui.graphics.Color(0xFFE8F5E9),
+                            androidx.compose.ui.graphics.Color(0xFF2E7D32)
                         )
+                        booking.status == "confirmed" -> Pair(
+                            androidx.compose.ui.graphics.Color(0xFFE8F5E9),
+                            androidx.compose.ui.graphics.Color(0xFF2E7D32)
+                        )
+                        booking.status in listOf("pending", "pending_payment", "created") -> Pair(
+                            androidx.compose.ui.graphics.Color(0xFFFFF8E1),
+                            androidx.compose.ui.graphics.Color(0xFFF57F17)
+                        )
+                        booking.status in listOf("cancelled", "rejected") -> Pair(
+                            androidx.compose.ui.graphics.Color(0xFFFFEBEE),
+                            androidx.compose.ui.graphics.Color(0xFFC62828)
+                        )
+                        booking.status == "checked_in" -> Pair(Blue100, Blue600)
+                        else -> Pair(Gray200, Gray600)
+                    }
+                    val displayStatus = when {
+                        booking.paymentId != null && booking.status == "pending" -> "Confirmada"
+                        else -> booking.statusDisplay ?: booking.status ?: "Sin estado"
+                    }
+                    Box(
+                        modifier = Modifier
+                            .background(badgeColor, RoundedCornerShape(4.dp))
+                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                    ) {
                         Text(
-                            " 4.8", // Hardcoded rating as it's not in booking response
-                            style = MaterialTheme.typography.bodyMedium,
+                            displayStatus,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = textColor,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -213,13 +255,18 @@ fun ReservaCard(booking: BookingResponse, onClick: () -> Unit) {
                             color = Gray600
                         )
                     }
-                    IconButton(onClick = { /* Delete logic */ }) {
-                        Icon(
-                            Icons.Default.Delete,
-                            null,
-                            tint = Color.Red,
-                            modifier = Modifier.size(24.dp)
-                        )
+                    val isPending = booking.status in listOf("pending", "pending_payment", "created")
+                            && booking.paymentId == null
+                    if (isPending) {
+                        Button(
+                            onClick = onPagar,
+                            shape = RoundedCornerShape(8.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Blue600),
+                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                            modifier = Modifier.testTag("btn_pagar_${booking.id}")
+                        ) {
+                            Text("Pagar", style = MaterialTheme.typography.labelMedium, color = White)
+                        }
                     }
                 }
             }

@@ -66,6 +66,11 @@ fun AuthNavGraph() {
                 onPerfil = { navController.navigate(Routes.PERFIL) },
                 onBuscarMas = { navController.navigate(Routes.HOME) },
                 onBookingClick = { id -> navController.navigate("${Routes.RESERVA_PRINT}/$id") },
+                onPagar = { id ->
+                    val booking = hotelViewModel.myBookings.find { it.id == id }
+                    hotelViewModel.selectedBookingForPayment = booking
+                    navController.navigate(Routes.PAGO)
+                },
                 onLogout = logout,
                 viewModel = hotelViewModel
             )
@@ -113,6 +118,18 @@ fun AuthNavGraph() {
         composable(Routes.CONFIRMACION) {
             ConfirmacionReservaScreen(
                 onHome = { navController.navigate(Routes.HOME) { popUpTo(Routes.HOME) { inclusive = true } } },
+                viewModel = hotelViewModel
+            )
+        }
+        composable(Routes.PAGO) {
+            PagoScreen(
+                onBack = { navController.popBackStack() },
+                onSuccess = {
+                    navController.navigate(Routes.MIS_RESERVAS) {
+                        popUpTo(Routes.MIS_RESERVAS) { inclusive = true }
+                    }
+                    hotelViewModel.fetchBookings()
+                },
                 viewModel = hotelViewModel
             )
         }

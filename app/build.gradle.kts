@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.detekt)
+    id("com.google.gms.google-services")
     jacoco
 }
 
@@ -135,6 +136,8 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.androidx.datastore)
     implementation(libs.coil.compose)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
     implementation(libs.androidx.media3.common.ktx)
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)

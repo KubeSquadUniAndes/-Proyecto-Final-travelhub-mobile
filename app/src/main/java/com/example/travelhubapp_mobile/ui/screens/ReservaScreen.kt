@@ -48,12 +48,6 @@ fun ReservaScreen(onBack: () -> Unit, onSuccess: () -> Unit, viewModel: HotelVie
     var telefono by remember { mutableStateOf("") }
     var documento by remember { mutableStateOf("") }
 
-    // Payment fields
-    var cardNumber by remember { mutableStateOf("") }
-    var cardName by remember { mutableStateOf("") }
-    var expiry by remember { mutableStateOf("") }
-    var cvv by remember { mutableStateOf("") }
-
     val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd", Locale.ROOT) }
 
     val nights = remember(viewModel.checkIn, viewModel.checkOut) {
@@ -67,7 +61,7 @@ fun ReservaScreen(onBack: () -> Unit, onSuccess: () -> Unit, viewModel: HotelVie
         } catch (_: Exception) { 1 }
     }
 
-    val pricePerNight = 600000.0 // Hardcoded for example as per image (1,800,000 / 3)
+    val pricePerNight = viewModel.selectedRoom?.price?.toDoubleOrNull() ?: 0.0
     val totalAmount = nights * pricePerNight
     val currencyFormatter = remember {
         NumberFormat.getCurrencyInstance(Locale("es", "CO")).apply {
@@ -117,18 +111,29 @@ fun ReservaScreen(onBack: () -> Unit, onSuccess: () -> Unit, viewModel: HotelVie
                         )
                     }
                     THButton(
-                        text = if (viewModel.isLoading) "Confirmando..." else "Confirmar reserva",
+                        text = if (viewModel.isLoading) "Reservando..." else "Reservar",
                         onClick = {
-                            viewModel.createBooking(
-                                travelerName = nombre,
-                                travelerEmail = email,
-                                travelerPhone = telefono,
-                                travelerDocument = documento,
-                                onSuccess = onSuccess
-                            )
+                            when {
+                                nombre.isBlank() -> viewModel.error = "El nombre es requerido"
+                                email.isBlank() || !email.contains("@") -> viewModel.error = "Ingresa un email válido"
+                                telefono.isBlank() -> viewModel.error = "El teléfono es requerido"
+                                documento.isBlank() -> viewModel.error = "El documento es requerido"
+                                viewModel.checkIn.isBlank() -> viewModel.error = "Selecciona la fecha de check-in"
+                                viewModel.checkOut.isBlank() -> viewModel.error = "Selecciona la fecha de check-out"
+                                else -> viewModel.createBooking(
+                                    travelerName = nombre,
+                                    travelerEmail = email,
+                                    travelerPhone = telefono,
+                                    travelerDocument = documento,
+                                    onSuccess = onSuccess
+                                )
+                            }
                         },
                         modifier = Modifier.fillMaxWidth()
                     )
+                    viewModel.error?.let {
+                        Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+                    }
                 }
             }
         },
@@ -162,13 +167,6 @@ fun ReservaScreen(onBack: () -> Unit, onSuccess: () -> Unit, viewModel: HotelVie
             )
 
             DetallesReservaCard(viewModel)
-
-            MetodoPagoCard(
-                cardNumber, { cardNumber = it },
-                cardName, { cardName = it },
-                expiry, { expiry = it },
-                cvv, { cvv = it }
-            )
 
             Spacer(Modifier.height(16.dp))
         }
@@ -324,43 +322,6 @@ private fun DetallesReservaCard(viewModel: HotelViewModel) {
                 placeholder = "2",
                 leadingIcon = Icons.Default.Group
             )
-        }
-    }
-}
-
-@Composable
-private fun MetodoPagoCard(
-    number: String, onNumberChange: (String) -> Unit,
-    name: String, onNameChange: (String) -> Unit,
-    expiry: String, onExpiryChange: (String) -> Unit,
-    cvv: String, onCvvChange: (String) -> Unit
-) {
-    Card(
-        shape = RoundedCornerShape(10.dp),
-        colors = CardDefaults.cardColors(containerColor = White),
-        elevation = CardDefaults.cardElevation(1.dp)
-    ) {
-        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Icon(Icons.Default.CreditCard, null, tint = Gray900)
-                Text(
-                    "Método de pago",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            THInput(value = number, onValueChange = onNumberChange, label = "Número de tarjeta", placeholder = "1234 5678 9012 3456")
-            THInput(value = name, onValueChange = onNameChange, label = "Nombre en la tarjeta", placeholder = "JUAN PEREZ")
-
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                Box(modifier = Modifier.weight(1f)) {
-                    THInput(value = expiry, onValueChange = onExpiryChange, label = "Vencimiento", placeholder = "MM/AA")
-                }
-                Box(modifier = Modifier.weight(1f)) {
-                    THInput(value = cvv, onValueChange = onCvvChange, label = "CVV", placeholder = "123")
-                }
-            }
         }
     }
 }
