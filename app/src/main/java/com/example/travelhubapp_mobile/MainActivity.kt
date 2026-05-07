@@ -51,6 +51,7 @@ class MainActivity : ComponentActivity() {
 
     private fun fetchFcmToken() {
         FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
+            android.util.Log.d("FCM_TOKEN", "Token: $token")
             TokenRepository.saveToken(applicationContext, token)
         }
     }

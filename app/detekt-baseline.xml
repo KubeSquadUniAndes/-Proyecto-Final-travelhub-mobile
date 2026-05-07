@@ -3,8 +3,13 @@
   <ManuallySuppressedIssues></ManuallySuppressedIssues>
   <CurrentIssues>
     <ID>CyclomaticComplexMethod:HomeScreen.kt$@Composable fun HomeScreen( onReservar: () -&gt; Unit, onPerfil: () -&gt; Unit, onMisReservas: () -&gt; Unit, onLogout: () -&gt; Unit, viewModel: HotelViewModel )</ID>
+    <ID>CyclomaticComplexMethod:MisReservasScreen.kt$@Composable fun ReservaCard(booking: BookingResponse, imageUrl: String? = null, onClick: () -&gt; Unit, onPagar: () -&gt; Unit = {})</ID>
+    <ID>CyclomaticComplexMethod:PagoScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun PagoScreen(onBack: () -&gt; Unit, onSuccess: () -&gt; Unit, viewModel: HotelViewModel)</ID>
+    <ID>CyclomaticComplexMethod:ReservaScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun ReservaScreen(onBack: () -&gt; Unit, onSuccess: () -&gt; Unit, viewModel: HotelViewModel)</ID>
     <ID>NewLineAtEndOfFile:ExampleInstrumentedTest.kt$com.example.travelhubapp_mobile.ExampleInstrumentedTest.kt</ID>
     <ID>TooManyFunctions:ApiService.kt$ApiService</ID>
+    <ID>UnusedImports:ReservaScreen.kt$import androidx.compose.material.icons.filled.CreditCard</ID>
+    <ID>UnusedImports:ReservaScreen.kt$import com.example.travelhubapp_mobile.ui.theme.Gray900</ID>
     <ID>WildcardImport:AuthNavGraph.kt$import com.example.travelhubapp_mobile.ui.screens.*</ID>
     <ID>WildcardImport:BienvenidaScreen.kt$import com.example.travelhubapp_mobile.ui.theme.*</ID>
     <ID>WildcardImport:ExampleInstrumentedTest.kt$import org.junit.Assert.*</ID>

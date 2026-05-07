@@ -10,6 +10,9 @@ import com.example.travelhubapp_mobile.network.BookingRequest
 import com.example.travelhubapp_mobile.network.BookingResponse
 import com.example.travelhubapp_mobile.network.HotelResponse
 import com.example.travelhubapp_mobile.network.HotelSearchRequest
+import com.example.travelhubapp_mobile.network.PaymentConfirmRequest
+import com.example.travelhubapp_mobile.network.PaymentRequest
+import com.example.travelhubapp_mobile.network.PaymentResponse
 import com.example.travelhubapp_mobile.network.RetrofitClient
 import com.example.travelhubapp_mobile.network.RoomImageResponse
 import com.example.travelhubapp_mobile.network.RoomResponse
@@ -31,6 +34,8 @@ class HotelViewModel(private val tokenManager: TokenManager) : ViewModel() {
     var selectedBookingDetails by mutableStateOf<BookingResponse?>(null)
     var roomImages by mutableStateOf<List<RoomImageResponse>>(emptyList())
     var roomImagesMap by mutableStateOf<Map<String, String>>(emptyMap())
+    var lastPayment by mutableStateOf<PaymentResponse?>(null)
+    var selectedBookingForPayment by mutableStateOf<BookingResponse?>(null)
 
     var isLoading by mutableStateOf(false)
     var error by mutableStateOf<String?>(null)
@@ -142,23 +147,76 @@ class HotelViewModel(private val tokenManager: TokenManager) : ViewModel() {
                 )
 
                 if (response.isSuccessful) {
-                    val createdBooking = response.body()
-                    lastBooking = createdBooking
-
-                    // Approve the booking
-                    createdBooking?.id?.let { bookingId ->
-                        val approveResponse = RetrofitClient.api.approveBooking(
-                            id = bookingId,
-                            token = "Bearer $token"
-                        )
-                        if (approveResponse.isSuccessful) {
-                            lastBooking = approveResponse.body()
-                        }
-                    }
-
+                    lastBooking = response.body()
                     onSuccess()
                 } else {
-                    error = "Error al crear reserva: ${response.message()}"
+                    val errorBody = response.errorBody()?.string() ?: ""
+                    error = when {
+                        errorBody.contains("schedule conflict") -> "La habitación no está disponible para las fechas seleccionadas"
+                        errorBody.contains("anomaly") -> "No se pudo completar la reserva. Intenta de nuevo"
+                        else -> "Error al crear reserva: ${response.message()}"
+                    }
+                }
+            } catch (e: IOException) {
+                error = "Error de red: ${e.message}"
+            } catch (e: HttpException) {
+                error = "Error HTTP: ${e.message}"
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+    fun createPayment(
+        bookingId: String,
+        amount: Double,
+        cardLastFour: String,
+        cardholderName: String,
+        cardholderEmail: String,
+        onSuccess: () -> Unit
+    ) {
+        if (skipNetworkForTests) return
+        viewModelScope.launch {
+            isLoading = true
+            error = null
+            try {
+                val token = tokenManager.getToken() ?: run {
+                    error = "Sesión no válida"
+                    return@launch
+                }
+                val response = RetrofitClient.api.createPayment(
+                    token = "Bearer $token",
+                    request = PaymentRequest(
+                        bookingId = bookingId,
+                        amount = amount,
+                        cardLastFour = cardLastFour,
+                        cardholderName = cardholderName,
+                        cardholderEmail = cardholderEmail
+                    )
+                )
+                if (response.isSuccessful) {
+                    lastPayment = response.body()
+                    val timestamp = java.text.SimpleDateFormat(
+                        "yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.ROOT
+                    ).format(java.util.Date())
+                    val confirmResponse = RetrofitClient.api.confirmPayment(
+                        paymentId = bookingId,
+                        token = "Bearer $token",
+                        request = PaymentConfirmRequest(
+                            providerTransactionId = "MOCK-TXN-${System.currentTimeMillis()}",
+                            paymentTimestamp = timestamp
+                        )
+                    )
+                    if (confirmResponse.isSuccessful) {
+                        lastPayment = confirmResponse.body()
+                    }
+                    onSuccess()
+                } else {
+                    val errorBody = response.errorBody()?.string() ?: ""
+                    error = when {
+                        errorBody.contains("already exists") -> "Esta reserva ya tiene un pago registrado"
+                        else -> "Error al procesar pago: ${response.message()}"
+                    }
                 }
             } catch (e: IOException) {
                 error = "Error de red: ${e.message}"

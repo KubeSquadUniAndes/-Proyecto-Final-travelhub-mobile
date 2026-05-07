@@ -44,6 +44,7 @@ class MisReservasScreenRoboTest {
                     onPerfil = {},
                     onBuscarMas = {},
                     onBookingClick = {},
+                    onPagar = {},
                     onLogout = {},
                     viewModel = viewModel
                 )
@@ -63,6 +64,7 @@ class MisReservasScreenRoboTest {
                     onPerfil = {},
                     onBuscarMas = {},
                     onBookingClick = {},
+                    onPagar = {},
                     onLogout = {},
                     viewModel = viewModel
                 )
@@ -83,7 +85,7 @@ class MisReservasScreenRoboTest {
 
         composeTestRule.setContent {
             TravelHubAppMobileTheme {
-                ReservaCard(booking = mockBooking, onClick = {})
+                ReservaCard(booking = mockBooking, onClick = {}, onPagar = {})
             }
         }
 
@@ -99,12 +101,80 @@ class MisReservasScreenRoboTest {
 
         composeTestRule.setContent {
             TravelHubAppMobileTheme {
-                ReservaCard(booking = mockBooking, onClick = { clicked = true })
+                ReservaCard(booking = mockBooking, onClick = { clicked = true }, onPagar = {})
             }
         }
 
         composeTestRule.onNodeWithText("CODE").performClick()
         assertTrue(clicked)
+    }
+
+    @Test
+    fun bookingCard_pendingStatus_showsPagarButton() {
+        val mockBooking = BookingResponse(
+            id = "b1",
+            bookingCode = "TH-MOCK-1",
+            status = "pending",
+            paymentId = null,
+            pricePerNight = "150"
+        )
+        composeTestRule.setContent {
+            TravelHubAppMobileTheme {
+                ReservaCard(booking = mockBooking, onClick = {}, onPagar = {})
+            }
+        }
+        composeTestRule.onNodeWithTag("btn_pagar_b1").assertExists()
+    }
+
+    @Test
+    fun bookingCard_confirmedStatus_hidesPagarButton() {
+        val mockBooking = BookingResponse(
+            id = "b1",
+            bookingCode = "TH-MOCK-1",
+            status = "confirmed",
+            pricePerNight = "150"
+        )
+        composeTestRule.setContent {
+            TravelHubAppMobileTheme {
+                ReservaCard(booking = mockBooking, onClick = {}, onPagar = {})
+            }
+        }
+        composeTestRule.onNodeWithTag("btn_pagar_b1").assertDoesNotExist()
+    }
+
+    @Test
+    fun bookingCard_pendingWithPaymentId_hidesPagarButton() {
+        val mockBooking = BookingResponse(
+            id = "b1",
+            bookingCode = "TH-MOCK-1",
+            status = "pending",
+            paymentId = "payment-existing-123",
+            pricePerNight = "150"
+        )
+        composeTestRule.setContent {
+            TravelHubAppMobileTheme {
+                ReservaCard(booking = mockBooking, onClick = {}, onPagar = {})
+            }
+        }
+        composeTestRule.onNodeWithTag("btn_pagar_b1").assertDoesNotExist()
+    }
+
+    @Test
+    fun bookingCard_pagarButton_triggersCallback() {
+        var pagarClicked = false
+        val mockBooking = BookingResponse(
+            id = "b1",
+            bookingCode = "TH-MOCK-1",
+            status = "pending",
+            pricePerNight = "150"
+        )
+        composeTestRule.setContent {
+            TravelHubAppMobileTheme {
+                ReservaCard(booking = mockBooking, onClick = {}, onPagar = { pagarClicked = true })
+            }
+        }
+        composeTestRule.onNodeWithTag("btn_pagar_b1").performClick()
+        assertTrue(pagarClicked)
     }
 
     @Test
@@ -116,6 +186,7 @@ class MisReservasScreenRoboTest {
                 onPerfil = {},
                 onBuscarMas = { buscarMasClicked.set(true) },
                 onBookingClick = {},
+                onPagar = {},
                 onLogout = {},
                 viewModel = viewModel
             )
@@ -142,6 +213,7 @@ class MisReservasScreenRoboTest {
                 onPerfil = { perfilClicked.set(true) },
                 onBuscarMas = {},
                 onBookingClick = {},
+                onPagar = {},
                 onLogout = {},
                 viewModel = viewModel
             )
