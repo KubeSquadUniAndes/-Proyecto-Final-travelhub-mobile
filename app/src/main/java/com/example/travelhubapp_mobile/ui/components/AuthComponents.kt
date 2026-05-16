@@ -44,6 +44,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -217,12 +218,18 @@ fun THDatePicker(
         initialSelectedDateMillis = initialMillis,
         selectableDates = object : SelectableDates {
             override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                val afterMin = minDate == null || utcTimeMillis >= minDate
-                val beforeMax = maxDate == null || utcTimeMillis <= maxDate
-                return afterMin && beforeMax
-            }
+                    val afterMin = minDate == null || utcTimeMillis >= minDate
+                    val beforeMax = maxDate == null || utcTimeMillis <= maxDate
+                    return afterMin && beforeMax
+                }
         }
     )
+
+    LaunchedEffect(value) {
+        if (value.isBlank()) {
+            datePickerState.selectedDateMillis = null
+        }
+    }
 
     val displayValue = if (value.isNotBlank()) {
         try { displayFormatter.format(formatter.parse(value)!!) } catch (_: Exception) { value }

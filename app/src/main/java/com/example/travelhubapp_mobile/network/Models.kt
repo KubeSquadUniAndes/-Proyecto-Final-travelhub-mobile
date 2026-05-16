@@ -171,6 +171,9 @@ data class BookingResponse(
     @SerializedName("traveler_document") val travelerDocument: String? = null,
     val cancellable: Boolean? = null,
     @SerializedName("payment_id") val paymentId: String? = null,
+    @SerializedName("qr_code") val qrCode: String? = null,
+    @SerializedName("qr_generated_at") val qrGeneratedAt: String? = null,
+    @SerializedName("qr_is_valid") val qrIsValid: Boolean? = null,
     @SerializedName("created_at") val createdAt: String? = null,
     @SerializedName("updated_at") val updatedAt: String? = null,
     val message: String? = null

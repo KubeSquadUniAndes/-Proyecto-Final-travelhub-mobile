@@ -109,4 +109,68 @@ class ReservaPrintScreenRoboTest {
         composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("Código QR Check-in").assertExists()
     }
+
+    @Test
+    fun displaysQrPendingMessage_whenNoQrCode() {
+        composeTestRule.setContent {
+            ReservaPrintScreen(
+                bookingId = "b1",
+                onBack = {},
+                onHome = {},
+                viewModel = viewModel
+            )
+        }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("El hotel debe aprobar tu reserva").assertExists()
+    }
+
+    @Test
+    fun displaysInvalidQrMessage_whenQrIsInvalid() {
+        viewModel.selectedBookingDetails = viewModel.selectedBookingDetails?.copy(
+            qrCode = "somebase64",
+            qrIsValid = false
+        )
+        composeTestRule.setContent {
+            ReservaPrintScreen(
+                bookingId = "b1",
+                onBack = {},
+                onHome = {},
+                viewModel = viewModel
+            )
+        }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Reserva cancelada o invalidada").assertExists()
+    }
+
+    @Test
+    fun backButton_triggersCallback() {
+        var clicked = false
+        composeTestRule.setContent {
+            ReservaPrintScreen(
+                bookingId = "b1",
+                onBack = { clicked = true },
+                onHome = {},
+                viewModel = viewModel
+            )
+        }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithContentDescription("Back").performClick()
+        assert(clicked)
+    }
+
+    @Test
+    fun volverAlInicioButton_triggersCallback() {
+        var clicked = false
+        composeTestRule.setContent {
+            ReservaPrintScreen(
+                bookingId = "b1",
+                onBack = {},
+                onHome = { clicked = true },
+                viewModel = viewModel
+            )
+        }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Volver al inicio").performScrollTo().performClick()
+        assert(clicked)
+    }
 }
