@@ -113,6 +113,7 @@
     <li><a href="#pago">Pago de Reserva</a></li>
     <li><a href="#confirmacion">Confirmación de Reserva</a></li>
     <li><a href="#mis-reservas">Mis Reservas</a></li>
+    <li><a href="#qr-checkin">Código QR de Check-in</a></li>
     <li><a href="#perfil">Mi Perfil</a></li>
     <li><a href="#notificaciones">Notificaciones Push</a></li>
     <li><a href="#faq">Preguntas Frecuentes</a></li>
@@ -652,8 +653,86 @@
   <tr><td><span class="badge">Completada</span></td><td>Check-out realizado</td></tr>
 </table>
 
-<!-- 13. PERFIL -->
-<h2 id="perfil">13. Mi Perfil</h2>
+<!-- QR CHECK-IN -->
+<h2 id="qr-checkin">13. Código QR de Check-in</h2>
+
+<div class="screens-row">
+  <div class="screen-wrap">
+    <div class="phone">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+        <div class="s-statusbar"><span>9:41</span><span>📶 🔋</span></div>
+        <div class="s-navbar"><span class="s-navbar-back">← Volver</span><span class="s-navbar-title">Detalle Reserva</span><span></span></div>
+        <div class="s-body">
+          <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:8px;margin-bottom:8px;text-align:center">
+            <div style="font-size:10px;font-weight:700;color:#166534">✅ Reserva Confirmada</div>
+            <div style="font-size:8px;color:#166534">#TH-2026-ABCDE</div>
+          </div>
+          <div style="text-align:center;margin:10px 0">
+            <div style="width:120px;height:120px;background:#fff;border:2px solid #e5e7eb;border-radius:8px;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:60px">▦</div>
+            <div style="font-size:10px;font-weight:700;margin-top:8px">Código QR Check-in</div>
+            <div style="font-size:8px;color:#6b7280">Escanea al llegar al hotel</div>
+          </div>
+          <div style="background:#fef9c3;border-radius:6px;padding:6px 8px;font-size:8px;color:#854d0e;margin-top:6px">
+            💡 El QR se genera automáticamente cuando el hotel aprueba tu reserva. También está disponible sin conexión.
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="screen-label">QR Disponible</div>
+  </div>
+  <div class="screen-wrap">
+    <div class="phone">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+        <div class="s-statusbar"><span>9:41</span><span>📶 🔋</span></div>
+        <div class="s-navbar"><span class="s-navbar-back">← Volver</span><span class="s-navbar-title">Detalle Reserva</span><span></span></div>
+        <div class="s-body">
+          <div style="background:#fef3c7;border:1px solid #fde68a;border-radius:8px;padding:8px;margin-bottom:8px;text-align:center">
+            <div style="font-size:10px;font-weight:700;color:#92400e">⏳ Pendiente de aprobación</div>
+            <div style="font-size:8px;color:#92400e">#TH-2026-XYZAB</div>
+          </div>
+          <div style="text-align:center;margin:10px 0">
+            <div style="width:120px;height:120px;background:#f9fafb;border:2px dashed #d1d5db;border-radius:8px;margin:0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">
+              <div style="font-size:28px;color:#9ca3af">▦</div>
+              <div style="font-size:8px;color:#6b7280;text-align:center">QR disponible al<br>confirmar reserva</div>
+            </div>
+            <div style="font-size:10px;font-weight:700;margin-top:8px">Código QR Check-in</div>
+            <div style="font-size:8px;color:#6b7280">El hotel debe aprobar tu reserva</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="screen-label">QR Pendiente</div>
+  </div>
+</div>
+
+<p>El código QR de check-in se genera automáticamente cuando el hotel aprueba tu reserva. Permite realizar el check-in de forma ágil al llegar al hotel sin esperar en recepción.</p>
+
+<h3>Cómo funciona:</h3>
+<div class="step"><span class="step-number">1</span>Crea tu reserva y realiza el pago.</div>
+<div class="step"><span class="step-number">2</span>El hotel aprueba la reserva — en ese momento se genera el QR automáticamente.</div>
+<div class="step"><span class="step-number">3</span>Recibirás una <strong>notificación push</strong> informando que tu reserva fue confirmada.</div>
+<div class="step"><span class="step-number">4</span>Abre el detalle de la reserva en <strong>Mis Reservas</strong> para ver el QR.</div>
+<div class="step"><span class="step-number">5</span>Al llegar al hotel, muestra el QR al personal para que lo escaneen.</div>
+
+<h3>Estados del QR:</h3>
+<table>
+  <tr><th>Estado</th><th>Descripción</th></tr>
+  <tr><td>✅ Disponible</td><td>Reserva confirmada por el hotel. QR listo para escanear.</td></tr>
+  <tr><td>⏳ No generado</td><td>La reserva aún no ha sido aprobada por el hotel.</td></tr>
+  <tr><td>⏰ Expirado</td><td>La fecha de check-in ya pasó sin realizar el check-in.</td></tr>
+  <tr><td>❌ Invalidado</td><td>La reserva fue cancelada o rechazada.</td></tr>
+</table>
+
+<h3>Disponibilidad offline:</h3>
+<p>Una vez que hayas consultado el detalle de tu reserva con el QR generado, <strong>el código se guarda automáticamente en tu dispositivo</strong>. Podrás verlo aunque no tengas conexión a internet. La app mostrará el indicador <strong>"📵 Modo sin conexión"</strong> cuando esté usando la copia local.</p>
+
+<div class="tip">El QR contiene: código de reserva, nombre del huésped, fechas de check-in/check-out y tipo de habitación. Es único e intransferible.</div>
+<div class="warning">El QR expira automáticamente cuando la fecha de check-in ha pasado. Si necesitas un nuevo QR contacta al hotel directamente.</div>
+
+<!-- 14. PERFIL (renumbered) -->
+<h2 id="perfil">14. Mi Perfil</h2>
 
 <div class="screens-row">
   <div class="screen-wrap">
@@ -700,8 +779,8 @@
   <li>Tocar <strong>"Cerrar Sesión"</strong> para salir de la app de forma segura</li>
 </ul>
 
-<!-- 14. NOTIFICACIONES -->
-<h2 id="notificaciones">14. Notificaciones Push</h2>
+<!-- 15. NOTIFICACIONES -->
+<h2 id="notificaciones">15. Notificaciones Push</h2>
 
 <div class="screens-row">
   <div class="screen-wrap">
@@ -760,8 +839,8 @@
 </table>
 <div class="tip">Para recibir notificaciones asegúrate de haber aceptado el permiso de notificaciones al instalar la app. Puedes habilitarlo en Ajustes → Apps → TravelHub → Notificaciones.</div>
 
-<!-- 15. FAQ -->
-<h2 id="faq">15. Preguntas Frecuentes</h2>
+<!-- 16. FAQ -->
+<h2 id="faq">16. Preguntas Frecuentes</h2>
 
 <h3>¿Puedo usar la app sin cuenta?</h3>
 <p>No. Debes registrarte como Viajero para acceder a todas las funciones.</p>

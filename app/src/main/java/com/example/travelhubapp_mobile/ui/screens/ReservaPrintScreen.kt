@@ -252,8 +252,8 @@ fun ReservaPrintScreen(
                         val qrBase64 = booking.qrCode ?: cachedQr
                         val isExpired = remember(booking.startTime) {
                             try {
-                                val fmt = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.ROOT)
-                                val checkIn = fmt.parse(booking.startTime?.substringBefore('Z') ?: "")
+                                val fmt = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.ROOT)
+                                val checkIn = fmt.parse(booking.startTime?.substringBefore('T') ?: "")
                                 checkIn != null && java.util.Date().after(checkIn)
                             } catch (_: Exception) { false }
                         }

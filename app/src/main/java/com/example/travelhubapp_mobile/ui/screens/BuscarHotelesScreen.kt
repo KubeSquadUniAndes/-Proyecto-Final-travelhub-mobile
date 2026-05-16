@@ -40,7 +40,11 @@ fun BuscarHotelesScreen(onBack: () -> Unit, onHotelClick: () -> Unit, viewModel:
     Column(Modifier.fillMaxSize().background(White)) {
         // Header
         Row(
-            modifier = Modifier.fillMaxWidth().background(White).padding(horizontal = 16.dp, vertical = 12.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(White)
+                .statusBarsPadding()
+                .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {

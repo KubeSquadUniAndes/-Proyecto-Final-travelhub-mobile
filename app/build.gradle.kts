@@ -141,6 +141,8 @@ dependencies {
     implementation(libs.androidx.media3.common.ktx)
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
+    testImplementation(libs.mockk)
+    testImplementation(libs.coroutines.test)
     testImplementation("androidx.test:core:1.6.1")
     testImplementation(libs.androidx.compose.ui)
     testImplementation(libs.androidx.compose.ui.test.junit4)

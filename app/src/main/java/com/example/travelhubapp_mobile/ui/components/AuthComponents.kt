@@ -218,10 +218,10 @@ fun THDatePicker(
         initialSelectedDateMillis = initialMillis,
         selectableDates = object : SelectableDates {
             override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                val afterMin = minDate == null || utcTimeMillis >= minDate
-                val beforeMax = maxDate == null || utcTimeMillis <= maxDate
-                return afterMin && beforeMax
-            }
+                    val afterMin = minDate == null || utcTimeMillis >= minDate
+                    val beforeMax = maxDate == null || utcTimeMillis <= maxDate
+                    return afterMin && beforeMax
+                }
         }
     )
 
