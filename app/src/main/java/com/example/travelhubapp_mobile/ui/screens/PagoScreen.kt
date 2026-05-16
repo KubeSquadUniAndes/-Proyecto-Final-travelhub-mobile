@@ -32,6 +32,55 @@ import com.example.travelhubapp_mobile.ui.viewmodels.HotelViewModel
 @Composable
 fun PagoScreen(onBack: () -> Unit, onSuccess: () -> Unit, viewModel: HotelViewModel) {
     val booking = viewModel.selectedBookingForPayment
+    var showSuccessDialog by remember { mutableStateOf(false) }
+
+    if (showSuccessDialog) {
+        AlertDialog(
+            onDismissRequest = {},
+            icon = {
+                Text("✅", style = MaterialTheme.typography.displaySmall)
+            },
+            title = {
+                Text("¡Pago exitoso!", fontWeight = FontWeight.Bold, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+            },
+            text = {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        "Tu pago fue procesado correctamente.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    )
+                    booking?.bookingCode?.let {
+                        Text(
+                            "Reserva: $it",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = Blue600,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    Text(
+                        "COP ${booking?.finalPrice ?: booking?.totalPrice ?: ""}",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Blue600,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = { showSuccessDialog = false; onSuccess() },
+                    colors = ButtonDefaults.buttonColors(containerColor = Blue600),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text("Ver mis reservas", color = White)
+                }
+            },
+            containerColor = White
+        )
+    }
 
     var cardNumber by remember { mutableStateOf("") }
     var cardName by remember { mutableStateOf("") }
@@ -97,7 +146,7 @@ fun PagoScreen(onBack: () -> Unit, onSuccess: () -> Unit, viewModel: HotelViewMo
                                     cardLastFour = lastFour,
                                     cardholderName = cardName,
                                     cardholderEmail = email,
-                                    onSuccess = onSuccess
+                                    onSuccess = { showSuccessDialog = true }
                                 )
                             }
                         },

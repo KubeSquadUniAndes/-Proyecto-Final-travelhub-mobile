@@ -12,10 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.People
-import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.QrCode2
 import androidx.compose.material.icons.filled.Schedule
 import com.example.travelhubapp_mobile.data.QrCacheManager
@@ -222,19 +219,6 @@ fun ReservaPrintScreen(
                 }
 
                 // Hotel Contact
-                Card(
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F7FF)),
-                    shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text("Información de contacto del hotel", fontWeight = FontWeight.Bold)
-                        IconInfo(Icons.Default.LocationOn, "Calle Principal 123, Centro, Ciudad")
-                        IconInfo(Icons.Default.Phone, "+57 300 456 7890")
-                        IconInfo(Icons.Default.Email, "hotelgrandluxury@hotel.com")
-                    }
-                }
-
                 // QR Section
                 Card(
                     modifier = Modifier.fillMaxWidth(),
