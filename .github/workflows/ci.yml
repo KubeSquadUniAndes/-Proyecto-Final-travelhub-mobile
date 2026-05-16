@@ -31,7 +31,7 @@ jobs:
       - name: Run unit tests
         run: ./gradlew testDebugUnitTest jacocoTestReport
 
-      - name: Check coverage threshold (70%)
+      - name: Check coverage threshold (80%)
         run: |
           COVERAGE=$(python3 -c "
           import xml.etree.ElementTree as ET
@@ -47,7 +47,7 @@ jobs:
           echo "Coverage: ${COVERAGE}%"
           python3 -c "
           cov = float('${COVERAGE}')
-          assert cov >= 70, f'Coverage {cov}% is below the 70% threshold'
+          assert cov >= 80, f'Coverage {cov}% is below the 80% threshold'
           print(f'Coverage check passed: {cov}%')
           "
 
