@@ -1,5 +1,7 @@
 package com.example.travelhubapp_mobile.ui.screens
 
+import android.graphics.BitmapFactory
+import android.util.Base64
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -16,12 +18,15 @@ import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.QrCode2
 import androidx.compose.material.icons.filled.Schedule
+import com.example.travelhubapp_mobile.data.QrCacheManager
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -34,6 +39,7 @@ import coil.request.ImageRequest
 import com.example.travelhubapp_mobile.ui.theme.Blue600
 import com.example.travelhubapp_mobile.ui.theme.Gray100
 import com.example.travelhubapp_mobile.ui.theme.Gray200
+import com.example.travelhubapp_mobile.ui.theme.Gray400
 import com.example.travelhubapp_mobile.ui.theme.Gray50
 import com.example.travelhubapp_mobile.ui.theme.Gray600
 import com.example.travelhubapp_mobile.ui.theme.Gray700
@@ -49,11 +55,19 @@ fun ReservaPrintScreen(
     onHome: () -> Unit,
     viewModel: HotelViewModel,
 ) {
+    val context = LocalContext.current
+
     LaunchedEffect(bookingId) {
         viewModel.fetchBookingDetails(bookingId)
     }
 
     val booking = viewModel.selectedBookingDetails
+
+    LaunchedEffect(booking?.qrCode) {
+        booking?.id?.let { id ->
+            booking.qrCode?.let { qr -> QrCacheManager.saveQr(context, id, qr) }
+        }
+    }
 
     LaunchedEffect(booking?.roomId) {
         booking?.roomId?.let { viewModel.fetchRoomImages(it) }
@@ -232,18 +246,89 @@ fun ReservaPrintScreen(
                         modifier = Modifier.padding(24.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .size(180.dp)
-                                .border(1.dp, Gray200, RoundedCornerShape(8.dp))
-                                .padding(16.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(Icons.Default.QrCode2, null, tint = Blue600, modifier = Modifier.fillMaxSize())
+                        val cachedQr = remember(bookingId) {
+                            QrCacheManager.getQr(context, bookingId)
+                        }
+                        val qrBase64 = booking.qrCode ?: cachedQr
+                        val isExpired = remember(booking.startTime) {
+                            try {
+                                val fmt = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.ROOT)
+                                val checkIn = fmt.parse(booking.startTime?.substringBefore('Z') ?: "")
+                                checkIn != null && java.util.Date().after(checkIn)
+                            } catch (_: Exception) { false }
+                        }
+                        val canShowQr = !qrBase64.isNullOrBlank() &&
+                            booking.qrIsValid != false &&
+                            !isExpired
+
+                        if (canShowQr) {
+                            val bitmap = remember(qrBase64) {
+                                try {
+                                    val bytes = Base64.decode(qrBase64, Base64.DEFAULT)
+                                    BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                                } catch (_: Exception) { null }
+                            }
+                            if (bitmap != null) {
+                                androidx.compose.foundation.Image(
+                                    bitmap = bitmap.asImageBitmap(),
+                                    contentDescription = "QR Check-in",
+                                    modifier = Modifier
+                                        .size(200.dp)
+                                        .border(1.dp, Gray200, RoundedCornerShape(8.dp))
+                                )
+                                if (cachedQr != null && booking.qrCode == null) {
+                                    Spacer(Modifier.height(4.dp))
+                                    Text(
+                                        "📵 Modo sin conexión",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = Gray600
+                                    )
+                                }
+                            }
+                        } else {
+                            Box(
+                                modifier = Modifier
+                                    .size(180.dp)
+                                    .border(1.dp, Gray200, RoundedCornerShape(8.dp))
+                                    .background(Gray50, RoundedCornerShape(8.dp))
+                                    .padding(16.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Icon(
+                                        Icons.Default.QrCode2,
+                                        null,
+                                        tint = Gray400,
+                                        modifier = Modifier.size(64.dp)
+                                    )
+                                    Text(
+                                        when {
+                                            isExpired -> "QR expirado"
+                                            booking.qrIsValid == false -> "QR invalidado"
+                                            else -> "QR disponible al\nconfirmar reserva"
+                                        },
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = Gray600,
+                                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                    )
+                                }
+                            }
                         }
                         Spacer(Modifier.height(16.dp))
                         Text("Código QR Check-in", fontWeight = FontWeight.Bold)
-                        Text("Escanea al llegar al hotel", style = MaterialTheme.typography.bodySmall, color = Gray600)
+                        Text(
+                            when {
+                                canShowQr -> "Escanea al llegar al hotel"
+                                isExpired -> "La fecha de check-in ya pasó"
+                                booking.qrIsValid == false -> "Reserva cancelada o invalidada"
+                                else -> "El hotel debe aprobar tu reserva"
+                            },
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Gray600
+                        )
                     }
                 }
 
