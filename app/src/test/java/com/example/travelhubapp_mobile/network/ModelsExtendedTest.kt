@@ -161,7 +161,8 @@ class ModelsExtendedTest {
 
     @Test
     fun hotelResponse_deserializesCorrectly() {
-        val json = """{"id":"h1","name":"Grand Hotel","rating":"4.5","price":"200000","reviews":"150","location":"Bogotá","image":"https://img.com/hotel.jpg"}"""
+        val json = """{"id":"h1","name":"Grand Hotel","rating":"4.5","price":"200000",""" +
+            """"reviews":"150","location":"Bogotá","image":"https://img.com/hotel.jpg"}"""
         val response = gson.fromJson(json, HotelResponse::class.java)
         assertEquals("h1", response.id)
         assertEquals("Grand Hotel", response.name)

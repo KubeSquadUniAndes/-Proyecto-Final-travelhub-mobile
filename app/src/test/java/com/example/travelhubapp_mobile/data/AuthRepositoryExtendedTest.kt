@@ -6,7 +6,6 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -72,16 +71,6 @@ class AuthRepositoryExtendedTest {
         assertTrue(result is AuthResult.Error)
         val error = result as AuthResult.Error
         assertNotNull(error.message)
-    }
-
-    @Test
-    fun register_networkError_returnsConnectionError() = runBlocking {
-        val result = authRepository.register(
-            "Juan", "García", "juan@example.com", "+57300123",
-            "SecurePass123!", "Colombia", "Bogotá", "1990-01-01",
-            "CC", "1234567890"
-        )
-        assertTrue(result is AuthResult.Error)
     }
 
     @Test

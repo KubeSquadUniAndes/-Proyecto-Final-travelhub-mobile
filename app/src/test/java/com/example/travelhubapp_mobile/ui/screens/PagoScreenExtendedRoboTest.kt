@@ -8,8 +8,6 @@ import com.example.travelhubapp_mobile.data.TokenManager
 import com.example.travelhubapp_mobile.network.BookingResponse
 import com.example.travelhubapp_mobile.ui.theme.TravelHubAppMobileTheme
 import com.example.travelhubapp_mobile.ui.viewmodels.HotelViewModel
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
