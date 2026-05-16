@@ -89,4 +89,77 @@ class ModelsTest {
         assertEquals("uuid-123", response.id)
         assertEquals("Created", response.message)
     }
+
+    @Test
+    fun paymentRequest_serializesCorrectly() {
+        val request = PaymentRequest(
+            bookingId = "b1", amount = 714.0,
+            cardLastFour = "4242", cardholderName = "Juan",
+            cardholderEmail = "juan@test.com"
+        )
+        val json = gson.toJson(request)
+        assertTrue(json.contains("\"booking_id\":\"b1\""))
+        assertTrue(json.contains("\"card_last_four\":\"4242\""))
+        assertTrue(json.contains("\"cardholder_name\":\"Juan\""))
+        assertEquals("mock", request.paymentProvider)
+        assertEquals("credit_card", request.paymentMethod)
+        assertEquals("USD", request.currency)
+    }
+
+    @Test
+    fun paymentResponse_deserializesCorrectly() {
+        val json = """{"id":"p1","booking_id":"b1","status":"confirmed","amount":"714.0"}"""
+        val response = gson.fromJson(json, PaymentResponse::class.java)
+        assertEquals("p1", response.id)
+        assertEquals("b1", response.bookingId)
+        assertEquals("confirmed", response.status)
+    }
+
+    @Test
+    fun paymentConfirmRequest_serializesCorrectly() {
+        val request = PaymentConfirmRequest(
+            providerTransactionId = "MOCK-TXN-123",
+            paymentTimestamp = "2026-05-01T12:00:00Z"
+        )
+        val json = gson.toJson(request)
+        assertTrue(json.contains("\"provider_transaction_id\":\"MOCK-TXN-123\""))
+        assertTrue(json.contains("\"payment_timestamp\":\"2026-05-01T12:00:00Z\""))
+    }
+
+    @Test
+    fun bookingResponse_deserializesWithQrFields() {
+        val json = """{"id":"b1","booking_code":"TH-2026-TEST","status":"confirmed",
+            "qr_code":"base64data","qr_is_valid":true,"payment_id":"p1"}"""
+        val response = gson.fromJson(json, BookingResponse::class.java)
+        assertEquals("b1", response.id)
+        assertEquals("base64data", response.qrCode)
+        assertEquals(true, response.qrIsValid)
+        assertEquals("p1", response.paymentId)
+    }
+
+    @Test
+    fun bookingResponse_nullQrFields_whenNotPresent() {
+        val json = """{"id":"b1","status":"pending"}"""
+        val response = gson.fromJson(json, BookingResponse::class.java)
+        assertNull(response.qrCode)
+        assertNull(response.qrIsValid)
+        assertNull(response.paymentId)
+    }
+
+    @Test
+    fun roomImageResponse_deserializesCorrectly() {
+        val json = """{"id":"img1","room_id":"r1","url":"https://s3.example.com/img.jpg","created_at":"2026-01-01"}"""
+        val response = gson.fromJson(json, RoomImageResponse::class.java)
+        assertEquals("img1", response.id)
+        assertEquals("r1", response.roomId)
+        assertEquals("https://s3.example.com/img.jpg", response.url)
+    }
+
+    @Test
+    fun fcmTokenRequest_serializesCorrectly() {
+        val request = FcmTokenRequest(fcmToken = "device-token-123")
+        val json = gson.toJson(request)
+        assertTrue(json.contains("\"fcm_token\":\"device-token-123\""))
+        assertEquals("android", request.platform)
+    }
 }

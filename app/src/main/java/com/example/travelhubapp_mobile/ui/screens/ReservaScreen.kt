@@ -299,7 +299,6 @@ private fun DetallesReservaCard(viewModel: HotelViewModel) {
                 onValueChange = { viewModel.checkIn = "${it}T12:00:00" },
                 label = "Check-in",
                 placeholder = "Selecciona fecha",
-                minDate = System.currentTimeMillis(),
                 maxDate = checkOutTime
             )
 
@@ -308,7 +307,7 @@ private fun DetallesReservaCard(viewModel: HotelViewModel) {
                 onValueChange = { viewModel.checkOut = "${it}T12:00:00" },
                 label = "Check-out",
                 placeholder = "Selecciona fecha",
-                minDate = checkInTime ?: System.currentTimeMillis()
+                minDate = checkInTime
             )
 
             THInput(

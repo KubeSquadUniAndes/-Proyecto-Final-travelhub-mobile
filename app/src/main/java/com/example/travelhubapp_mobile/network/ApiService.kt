@@ -67,7 +67,7 @@ interface ApiService {
         @Header("Authorization") token: String
     ): Response<BookingResponse>
 
-    @POST("users/api/v1/users/fcm-token")
+    @POST("login-handler/api/v1/auth/fcm-token")
     suspend fun registerFcmToken(
         @Header("Authorization") token: String,
         @Body request: FcmTokenRequest

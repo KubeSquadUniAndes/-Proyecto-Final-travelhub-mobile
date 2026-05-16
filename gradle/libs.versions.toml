@@ -17,6 +17,8 @@ datastore = "1.1.1"
 robolectric = "4.14.1"
 kover = "0.8.3"
 detekt = "1.23.7"
+mockk = "1.13.10"
+coroutinesTest = "1.7.3"
 coil = "2.7.0"
 media3CommonKtx = "1.10.0"
 firebaseMessaging = "24.1.1"
@@ -25,6 +27,8 @@ googleServices = "4.4.4"
 
 [libraries]
 robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutinesTest" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

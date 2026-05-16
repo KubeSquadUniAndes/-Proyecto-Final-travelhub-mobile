@@ -98,7 +98,6 @@ fun HomeScreen(
                     onValueChange = { viewModel.checkIn = "${it}T12:00:00" },
                     label = "Check-in",
                     placeholder = "Selecciona fecha",
-                    minDate = System.currentTimeMillis(),
                     maxDate = checkOutTime,
                     testTag = "picker_checkin"
                 )
@@ -108,7 +107,7 @@ fun HomeScreen(
                     onValueChange = { viewModel.checkOut = "${it}T12:00:00" },
                     label = "Check-out",
                     placeholder = "Selecciona fecha",
-                    minDate = checkInTime ?: System.currentTimeMillis(),
+                    minDate = checkInTime,
                     testTag = "picker_checkout"
                 )
 
