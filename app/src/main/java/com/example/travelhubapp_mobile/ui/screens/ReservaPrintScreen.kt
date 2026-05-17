@@ -55,6 +55,7 @@ fun ReservaPrintScreen(
     val context = LocalContext.current
 
     LaunchedEffect(bookingId) {
+        viewModel.selectedBookingDetails = null
         viewModel.fetchBookingDetails(bookingId)
     }
 
@@ -245,6 +246,8 @@ fun ReservaPrintScreen(
                             booking.qrIsValid != false &&
                             !isExpired
 
+                        val isConfirmed = booking.status == "confirmed"
+
                         if (canShowQr) {
                             val bitmap = remember(qrBase64) {
                                 try {
@@ -292,6 +295,7 @@ fun ReservaPrintScreen(
                                         when {
                                             isExpired -> "QR expirado"
                                             booking.qrIsValid == false -> "QR invalidado"
+                                            isConfirmed -> "QR en proceso de generación"
                                             else -> "QR disponible al\nconfirmar reserva"
                                         },
                                         style = MaterialTheme.typography.labelSmall,
@@ -308,6 +312,7 @@ fun ReservaPrintScreen(
                                 canShowQr -> "Escanea al llegar al hotel"
                                 isExpired -> "La fecha de check-in ya pasó"
                                 booking.qrIsValid == false -> "Reserva cancelada o invalidada"
+                                isConfirmed -> "El QR se generará en breve"
                                 else -> "El hotel debe aprobar tu reserva"
                             },
                             style = MaterialTheme.typography.bodySmall,
