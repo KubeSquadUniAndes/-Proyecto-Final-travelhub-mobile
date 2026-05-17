@@ -23,95 +23,84 @@ class ReservaPrintScreenRoboTest {
 
     private lateinit var viewModel: HotelViewModel
 
+    private val mockBooking = BookingResponse(
+        id = "b1",
+        bookingCode = "TH-PRINT-TEST",
+        statusDisplay = "Reserva Confirmada",
+        travelerName = "Juan Test",
+        travelerEmail = "juan@test.com",
+        travelerPhone = "+57 300 000 0000",
+        numGuests = 2,
+        totalNights = 1,
+        pricePerNight = "600000",
+        totalPrice = "600000",
+        taxes = "114000",
+        finalPrice = "714000",
+        roomType = "Deluxe"
+    )
+
     @Before
     fun setup() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         val tokenManager = TokenManager(context)
         viewModel = HotelViewModel(tokenManager)
         viewModel.skipNetworkForTests = true
+        viewModel.selectedBookingDetails = mockBooking
+    }
 
-        viewModel.selectedBookingDetails = BookingResponse(
-            id = "b1",
-            bookingCode = "TH-PRINT-TEST",
-            statusDisplay = "Reserva Confirmada",
-            travelerName = "Juan Test",
-            travelerEmail = "juan@test.com",
-            travelerPhone = "+57 300 000 0000",
-            numGuests = 2,
-            totalNights = 1,
-            pricePerNight = "600000",
-            totalPrice = "600000",
-            taxes = "114000",
-            finalPrice = "714000",
-            roomType = "Deluxe"
-        )
+    private fun setScreen(onBack: () -> Unit = {}, onHome: () -> Unit = {}) {
+        viewModel.selectedBookingDetails = mockBooking
+        composeTestRule.setContent {
+            ReservaPrintScreen(
+                bookingId = "b1",
+                onBack = onBack,
+                onHome = onHome,
+                viewModel = viewModel
+            )
+        }
+        composeTestRule.waitForIdle()
+        // Restore booking after LaunchedEffect clears it in test mode
+        if (viewModel.selectedBookingDetails == null) {
+            viewModel.selectedBookingDetails = mockBooking
+        }
+        composeTestRule.waitForIdle()
     }
 
     @Test
     fun displaysConfirmationBanner() {
-        composeTestRule.setContent {
-            ReservaPrintScreen(
-                bookingId = "b1",
-                onBack = {},
-                onHome = {},
-                viewModel = viewModel
-            )
-        }
-
-        composeTestRule.waitForIdle()
-        // Check for the number with #
+        setScreen()
         composeTestRule.onNodeWithText("#TH-PRINT-TEST", substring = true).assertExists()
     }
 
     @Test
     fun displaysGuestInformation() {
-        composeTestRule.setContent {
-            ReservaPrintScreen(
-                bookingId = "b1",
-                onBack = {},
-                onHome = {},
-                viewModel = viewModel
-            )
-        }
-
-        composeTestRule.waitForIdle()
+        setScreen()
         composeTestRule.onNodeWithText("Juan Test").assertExists()
     }
 
     @Test
     fun displaysPaymentSummary() {
-        composeTestRule.setContent {
-            ReservaPrintScreen(
-                bookingId = "b1",
-                onBack = {},
-                onHome = {},
-                viewModel = viewModel
-            )
-        }
-
-        composeTestRule.waitForIdle()
-        // Verify substrings exist in the tree
+        setScreen()
         composeTestRule.onAllNodesWithText("600000", substring = true).onFirst().assertExists()
         composeTestRule.onAllNodesWithText("714000", substring = true).onFirst().assertExists()
     }
 
     @Test
     fun displaysQRSection() {
-        composeTestRule.setContent {
-            ReservaPrintScreen(
-                bookingId = "b1",
-                onBack = {},
-                onHome = {},
-                viewModel = viewModel
-            )
-        }
-
-        composeTestRule.waitForIdle()
+        setScreen()
         composeTestRule.onNodeWithText("Código QR Check-in").assertExists()
     }
 
     @Test
     fun displaysQrPendingMessage_whenNoQrCode() {
+        setScreen()
+        composeTestRule.onNodeWithText("El hotel debe aprobar tu reserva").assertExists()
+    }
+
+    @Test
+    fun displaysInvalidQrMessage_whenQrIsInvalid() {
+        val invalidBooking = mockBooking.copy(qrCode = "somebase64", qrIsValid = false)
+        viewModel.selectedBookingDetails = invalidBooking
         composeTestRule.setContent {
             ReservaPrintScreen(
                 bookingId = "b1",
@@ -121,22 +110,8 @@ class ReservaPrintScreenRoboTest {
             )
         }
         composeTestRule.waitForIdle()
-        composeTestRule.onNodeWithText("El hotel debe aprobar tu reserva").assertExists()
-    }
-
-    @Test
-    fun displaysInvalidQrMessage_whenQrIsInvalid() {
-        viewModel.selectedBookingDetails = viewModel.selectedBookingDetails?.copy(
-            qrCode = "somebase64",
-            qrIsValid = false
-        )
-        composeTestRule.setContent {
-            ReservaPrintScreen(
-                bookingId = "b1",
-                onBack = {},
-                onHome = {},
-                viewModel = viewModel
-            )
+        if (viewModel.selectedBookingDetails == null) {
+            viewModel.selectedBookingDetails = invalidBooking
         }
         composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("Reserva cancelada o invalidada").assertExists()
@@ -145,15 +120,7 @@ class ReservaPrintScreenRoboTest {
     @Test
     fun backButton_triggersCallback() {
         var clicked = false
-        composeTestRule.setContent {
-            ReservaPrintScreen(
-                bookingId = "b1",
-                onBack = { clicked = true },
-                onHome = {},
-                viewModel = viewModel
-            )
-        }
-        composeTestRule.waitForIdle()
+        setScreen(onBack = { clicked = true })
         composeTestRule.onNodeWithContentDescription("Back").performClick()
         assert(clicked)
     }
@@ -161,15 +128,7 @@ class ReservaPrintScreenRoboTest {
     @Test
     fun volverAlInicioButton_triggersCallback() {
         var clicked = false
-        composeTestRule.setContent {
-            ReservaPrintScreen(
-                bookingId = "b1",
-                onBack = {},
-                onHome = { clicked = true },
-                viewModel = viewModel
-            )
-        }
-        composeTestRule.waitForIdle()
+        setScreen(onHome = { clicked = true })
         composeTestRule.onNodeWithText("Volver al inicio").performScrollTo().performClick()
         assert(clicked)
     }
